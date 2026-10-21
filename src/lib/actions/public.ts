@@ -30,15 +30,21 @@ export async function submitContactAction(input: unknown): Promise<ActionResult>
 
     await ContactMessage.create(msg);
 
-    const notifyTo = settings?.contact?.email?.trim() || process.env.CONTACT_TO_EMAIL?.trim() || "";
-    if (notifyTo) {
-      await notifyContactEmail({
-        to: notifyTo,
-        visitorName: msg.name,
-        visitorEmail: msg.email,
-        subject: msg.subject,
-        message: msg.message,
-      });
+    // Prefer env so Vercel CONTACT_TO_EMAIL always wins; then admin settings email.
+    const notifyTo =
+      process.env.CONTACT_TO_EMAIL?.trim() ||
+      settings?.contact?.email?.trim() ||
+      "ebadkhan6292002@gmail.com";
+
+    const mailed = await notifyContactEmail({
+      to: notifyTo,
+      visitorName: msg.name,
+      visitorEmail: msg.email,
+      subject: msg.subject,
+      message: msg.message,
+    });
+    if (!mailed.sent) {
+      console.error("[contact] message saved but email not sent:", mailed.error || "RESEND_API_KEY / recipient missing");
     }
 
     return { ok: true, message: "Thanks — your message was sent. I'll reply by email." };

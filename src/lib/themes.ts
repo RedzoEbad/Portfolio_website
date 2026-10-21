@@ -46,7 +46,7 @@ export const THEMES = [
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 export const THEME_IDS = THEMES.map((t) => t.id);
-export const DEFAULT_THEME: ThemeId = "dark";
+export const DEFAULT_THEME: ThemeId = "light";
 
 export function themeMeta(id: string) {
   return THEMES.find((t) => t.id === id) ?? THEMES[0];

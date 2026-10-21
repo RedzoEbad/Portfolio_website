@@ -33,19 +33,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#050816" },
-    { media: "(prefers-color-scheme: light)", color: "#f3f6fb" },
-  ],
+  themeColor: "#f3f6fb",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
+/** Apply stored theme (or cool paper / light default) before paint to avoid a flash. */
+const themeBoot = `(function(){try{var t=localStorage.getItem('theme')||'light';var a=['light','dark','aubergine','neon','onyx','maroon'];document.documentElement.classList.remove.apply(document.documentElement.classList,a);if(a.indexOf(t)>=0)document.documentElement.classList.add(t);else document.documentElement.classList.add('light');}catch(e){document.documentElement.classList.add('light')}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-auto" suppressHydrationWarning>
+    <html lang="en" className="light scroll-auto" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}`}</style>
         </noscript>

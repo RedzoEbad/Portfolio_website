@@ -29,19 +29,12 @@ export default async function AboutPage() {
     <>
       <PageIntro title={`About ${settings.ownerName}`} lede={settings.about.intro || settings.role} />
       <Container className="pt-16">
-        <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-          <div className="min-w-0">
-            {settings.about.body ? (
-              <Markdown source={settings.about.body} />
-            ) : (
-              !hasBio && <EmptyState title="The bio hasn't been written yet" body="It's edited under Settings → About in the admin portal." />
-            )}
-          </div>
-
-          <aside className="space-y-5 lg:sticky lg:top-28">
+        <div className="grid gap-10 sm:gap-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+          {/* Portrait first on mobile; sticky sidebar on desktop */}
+          <aside className="order-1 mx-auto w-full max-w-sm space-y-5 lg:order-2 lg:mx-0 lg:max-w-none lg:sticky lg:top-28">
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-hull-2">
               {settings.avatar?.url ? (
-                <SmartImage src={settings.avatar.url} alt={settings.avatar.alt || settings.ownerName} fill sizes="320px" className="object-cover" priority />
+                <SmartImage src={settings.avatar.url} alt={settings.avatar.alt || settings.ownerName} fill sizes="(max-width: 1023px) 100vw, 320px" className="object-cover" priority />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
                   <span className="grid h-16 w-16 place-items-center rounded-full border border-line bg-hull text-fog">
@@ -62,6 +55,14 @@ export default async function AboutPage() {
               <SocialLinks settings={settings} className="mt-5" />
             </div>
           </aside>
+
+          <div className="order-2 min-w-0 lg:order-1">
+            {settings.about.body ? (
+              <Markdown source={settings.about.body} />
+            ) : (
+              !hasBio && <EmptyState title="The bio hasn't been written yet" body="It's edited under Settings → About in the admin portal." />
+            )}
+          </div>
         </div>
 
         {Object.keys(groups).length > 0 && (
