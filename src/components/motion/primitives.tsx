@@ -9,29 +9,29 @@ import { useMediaQuery, useSafeReducedMotion } from "@/lib/hooks";
  * Reveal: content is always rendered and readable; motion only adds a short entrance.
  * Variants are intentionally different per component family.
  */
+/** Opacity/transform only — never clip-path or filter (those stall scrolling). */
 const VARIANTS = {
-  rise: { hidden: { opacity: 0, y: 22 }, shown: { opacity: 1, y: 0 } },
-  clip: { hidden: { clipPath: "inset(0 0 100% 0)" }, shown: { clipPath: "inset(0 0 0% 0)" } },
-  wipe: { hidden: { clipPath: "inset(0 100% 0 0)" }, shown: { clipPath: "inset(0 0% 0 0)" } },
+  rise: { hidden: { opacity: 0, y: 16 }, shown: { opacity: 1, y: 0 } },
+  clip: { hidden: { opacity: 0, y: 16 }, shown: { opacity: 1, y: 0 } },
+  wipe: { hidden: { opacity: 0, y: 16 }, shown: { opacity: 1, y: 0 } },
   fade: { hidden: { opacity: 0 }, shown: { opacity: 1 } },
-  scale: { hidden: { opacity: 0, scale: 0.94 }, shown: { opacity: 1, scale: 1 } },
-  blur: { hidden: { opacity: 0, filter: "blur(10px)", y: 12 }, shown: { opacity: 1, filter: "blur(0px)", y: 0 } },
+  scale: { hidden: { opacity: 0, y: 12 }, shown: { opacity: 1, y: 0 } },
+  blur: { hidden: { opacity: 0, y: 12 }, shown: { opacity: 1, y: 0 } },
 } as const;
 
 export function Reveal({ children, variant = "rise", delay = 0, className, as = "div", ...rest }: { children: ReactNode; variant?: keyof typeof VARIANTS; delay?: number; className?: string; as?: "div" | "section" | "li" | "article" } & Omit<HTMLMotionProps<"div">, "children">) {
   const reduce = useSafeReducedMotion();
   const Comp = motion[as] as typeof motion.div;
   if (reduce) return <Comp className={className}>{children}</Comp>;
-  const long = variant === "clip" || variant === "wipe" || variant === "blur";
   return (
     <Comp
       data-reveal=""
       className={className}
       initial="hidden"
       whileInView="shown"
-      viewport={{ once: true, margin: "0px 0px -10% 0px", amount: 0.15 }}
+      viewport={{ once: true, margin: "0px 0px -6% 0px", amount: 0.1 }}
       variants={VARIANTS[variant]}
-      transition={{ duration: long ? 0.85 : 0.62, ease: [0.22, 1, 0.36, 1], delay }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay }}
       {...rest}
     >
       {children}

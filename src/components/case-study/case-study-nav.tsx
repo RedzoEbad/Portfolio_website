@@ -1,13 +1,12 @@
 "use client";
 
-import { motion, useScroll } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-/** Reading-progress bar plus a scroll-spy section list (sticky on desktop, a pill strip on mobile). */
+/** Section list + lightweight progress bar (DOM only — no Framer useScroll). */
 export function CaseStudyNav({ items }: { items: { id: string; title: string }[] }) {
   const [active, setActive] = useState(items[0]?.id);
-  const { scrollYProgress } = useScroll();
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const els = items.map((i) => document.getElementById(i.id)).filter(Boolean) as HTMLElement[];
@@ -22,9 +21,29 @@ export function CaseStudyNav({ items }: { items: { id: string; title: string }[]
     return () => io.disconnect();
   }, [items]);
 
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    let ticking = false;
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      bar.style.transform = `scaleX(${p})`;
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <>
-      <motion.div className="fixed inset-x-0 top-0 z-[55] h-0.5 origin-left bg-gradient-to-r from-signal via-ion to-flare will-change-transform" style={{ scaleX: scrollYProgress }} aria-hidden="true" />
+      <div ref={barRef} className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-0.5 origin-left bg-gradient-to-r from-signal via-ion to-flare" style={{ transform: "scaleX(0)" }} aria-hidden="true" />
       <nav aria-label="Case study sections" className="lg:sticky lg:top-28">
         <p className="mb-3 hidden text-sm text-fog lg:block">On this page</p>
         <ol className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:block lg:space-y-0.5 lg:overflow-visible lg:px-0">
@@ -38,7 +57,7 @@ export function CaseStudyNav({ items }: { items: { id: string; title: string }[]
                   active === i.id ? "border-signal text-frost lg:border-signal" : "border-line text-fog hover:text-frost lg:border-line",
                 )}
               >
-                {active === i.id && <motion.span layoutId="cs-active" className="absolute top-0 bottom-0 -left-px hidden w-0.5 bg-signal lg:block" />}
+                {active === i.id && <span className="absolute top-0 bottom-0 -left-px hidden w-0.5 bg-signal lg:block" aria-hidden="true" />}
                 {i.title}
               </a>
             </li>

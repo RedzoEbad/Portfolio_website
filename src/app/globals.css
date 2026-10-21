@@ -204,19 +204,15 @@
   html.neon,
   html.maroon { color-scheme: dark; }
 
-  /* Brief color tween when picking a theme (class toggled from ThemeToggle) */
+  /* Theme switch: only paint the root surfaces — never `*` (that lags scroll). */
   html.theme-animate,
-  html.theme-animate body,
-  html.theme-animate body * {
-    transition:
-      background-color 0.4s ease,
-      color 0.35s ease,
-      border-color 0.35s ease,
-      box-shadow 0.4s ease,
-      fill 0.35s ease,
-      stroke 0.35s ease !important;
+  html.theme-animate body {
+    transition: background-color 0.35s ease, color 0.3s ease !important;
   }
 
+  html, body {
+    overflow-x: clip;
+  }
   body {
     background: var(--abyss);
     color: var(--frost);
@@ -224,35 +220,13 @@
     font-size: var(--text-base);
     line-height: 1.6;
     font-variation-settings: "opsz" 14;
-    overscroll-behavior-y: auto;
-    position: relative;
-    isolation: isolate;
+    overscroll-behavior-y: none;
   }
-  /* Soft ambient wash — stronger on aubergine / neon */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: -20% -10%;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(closest-side at 18% 12%, var(--ambient-a), transparent 70%),
-      radial-gradient(closest-side at 88% 78%, var(--ambient-b), transparent 72%),
-      radial-gradient(closest-side at 70% 18%, var(--glow-flare), transparent 65%);
-    filter: blur(var(--theme-blur));
-    opacity: 0.85;
-  }
-  .aubergine body::before,
-  html.aubergine body::before,
-  .onyx body::before,
-  html.onyx body::before,
-  .maroon body::before,
-  html.maroon body::before {
-    animation: aurora-drift 22s ease-in-out infinite alternate;
-  }
-  .neon body::before,
-  html.neon body::before {
-    animation: neon-pulse 4s ease-in-out infinite;
+
+  /* Nav scrolled state — toggled via classList, not React state */
+  .site-header.is-scrolled {
+    background: color-mix(in srgb, var(--hull) 94%, transparent);
+    border-bottom-color: var(--line);
   }
 
   h1, h2, h3, h4 {
@@ -322,14 +296,16 @@
     50% { box-shadow: 0 0 0 6px transparent; }
   }
 
-  .float-soft { animation: float-y 7s ease-in-out infinite; }
-  .lift-card {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.45s ease;
-  }
-  .lift-card:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--signal) 45%, var(--line));
-    box-shadow: 0 18px 40px -28px var(--glow-signal);
+  @media (prefers-reduced-motion: no-preference) and (pointer: fine) {
+    .float-soft { animation: float-y 7s ease-in-out infinite; }
+    .lift-card {
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.35s ease;
+    }
+    .lift-card:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--signal) 45%, var(--line));
+      box-shadow: 0 18px 40px -28px var(--glow-signal);
+    }
   }
 
   /* Editorial hairline used between stacked home sections */
@@ -385,7 +361,6 @@
   body { font-size: 1rem; }
   .hero-line { font-size: clamp(2.15rem, 11vw, 3.25rem); }
   .bg-grid { background-size: 32px 32px; }
-  body::before { opacity: 0.55; }
 }
 
 @media (min-width: 640px) and (max-width: 1023px) {
@@ -403,6 +378,5 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  body::before { filter: none !important; animation: none !important; }
   .lift-card:hover { transform: none; }
 }

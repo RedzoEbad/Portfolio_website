@@ -24,7 +24,7 @@ export function FeaturedProjects({ projects }: { projects: ProjectCardDTO[] }) {
         ) : (
           <div className="space-y-8 md:space-y-12 lg:space-y-16">
             {projects.map((p, i) => (
-              <Reveal key={p._id} variant={i % 2 === 0 ? "blur" : "rise"} delay={0.05}>
+              <Reveal key={p._id} variant="rise" delay={i * 0.04}>
                 <ProjectFeature p={p} flip={i % 2 === 1} priority={i === 0} index={i} />
               </Reveal>
             ))}
@@ -92,15 +92,16 @@ export function JourneySection({ events }: { events: TimelineDTO[] }) {
           index="04 — Path"
           align="split"
           title="Engineering journey"
-          lede="Certifications, projects, and the lessons that changed how I build."
+          lede="Certifications, published projects, and milestones — newest first."
           action={events.length ? { href: "/about", label: "More about me" } : undefined}
         />
         {events.length ? (
-          <Reveal variant="wipe">
-            <Timeline events={events} />
-          </Reveal>
+          <Timeline events={events} />
         ) : (
-          <EmptyState title="The timeline is empty" body="Milestones added in the admin portal show up here in date order." />
+          <EmptyState
+            title="The journey is empty"
+            body="Publish a project, add a certification under Admin → Certifications, or add a milestone under Admin → Timeline. They all show up here."
+          />
         )}
       </Container>
     </section>

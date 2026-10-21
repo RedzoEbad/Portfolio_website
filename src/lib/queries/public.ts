@@ -367,15 +367,65 @@ export async function getPostsForProject(projectId: string, limit = 3): Promise<
   )();
 }
 
-/* ---------------- Profile ---------------- */
+/* ---------------- Profile / Engineering journey ---------------- */
+function normTitle(s: string) {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/**
+ * Homepage + About journey: published timeline milestones, plus certifications
+ * and published projects (so those don't need a duplicate manual milestone).
+ */
 export const getTimeline = cache(() =>
   unstable_cache(
     async (): Promise<TimelineDTO[]> => {
       await connectDB();
-      return serialize<TimelineDTO[]>(await TimelineEvent.find({ published: true }).sort({ date: -1 }).lean());
+      const [milestones, certs, projects] = await Promise.all([
+        TimelineEvent.find({ published: true }).lean(),
+        Certification.find().lean(),
+        Project.find(PUBLISHED_PROJECT).select("title slug summary publishedAt createdAt").lean(),
+      ]);
+
+      const items: TimelineDTO[] = serialize<TimelineDTO[]>(milestones);
+      const seen = new Set(items.map((i) => normTitle(i.title)));
+
+      for (const c of certs) {
+        const title = String(c.name ?? "").trim();
+        if (!title || seen.has(normTitle(title))) continue;
+        seen.add(normTitle(title));
+        const when = c.issuedAt ?? (c as { createdAt?: Date }).createdAt ?? new Date();
+        items.push({
+          _id: `cert-${String(c._id)}`,
+          title,
+          date: new Date(when).toISOString(),
+          kind: "certification",
+          description: c.issuer ? `Issued by ${c.issuer}` : "",
+          link: c.credentialUrl || "",
+          published: true,
+        });
+      }
+
+      for (const p of projects) {
+        const title = String(p.title ?? "").trim();
+        if (!title || seen.has(normTitle(title))) continue;
+        seen.add(normTitle(title));
+        const when = p.publishedAt ?? (p as { createdAt?: Date }).createdAt ?? new Date();
+        items.push({
+          _id: `project-${String(p._id)}`,
+          title,
+          date: new Date(when).toISOString(),
+          kind: "project",
+          description: p.summary || "",
+          link: `/projects/${p.slug}`,
+          published: true,
+        });
+      }
+
+      items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      return items;
     },
-    ["timeline"],
-    { revalidate: REVALIDATE, tags: [CACHE_TAGS.timeline] },
+    ["timeline-journey-v2"],
+    { revalidate: REVALIDATE, tags: [CACHE_TAGS.timeline, CACHE_TAGS.certifications, CACHE_TAGS.projects] },
   )(),
 );
 

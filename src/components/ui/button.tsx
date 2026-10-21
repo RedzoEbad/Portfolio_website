@@ -15,7 +15,7 @@ export type ButtonSize = keyof typeof sizes;
 
 export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md", className?: string) {
   return cn(
-    "inline-flex items-center justify-center rounded-lg font-medium whitespace-nowrap transition-[background,color,border-color,filter,transform,box-shadow] duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:hover:translate-y-0 select-none",
+    "inline-flex items-center justify-center rounded-lg font-medium whitespace-nowrap transition-[background,color,border-color,box-shadow] duration-200 active:brightness-95 disabled:opacity-50 disabled:pointer-events-none select-none",
     variants[variant],
     sizes[size],
     className,

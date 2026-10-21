@@ -8,7 +8,7 @@ export default async function AdminTimeline() {
   const items = await adminTimeline();
   return (
     <>
-      <AdminHeader title="Engineering timeline" description="Milestones shown on the homepage journey and the About page, newest first. Only add things that really happened." />
+      <AdminHeader title="Engineering timeline" description="Extra milestones for the homepage journey and About page. Published projects and certifications are included automatically — use this for lessons, roles, and other moments." />
       <ProfileManager kind="timeline" items={items} />
     </>
   );

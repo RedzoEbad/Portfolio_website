@@ -39,7 +39,7 @@ export default async function HomePage() {
       {h.showDomains && <DomainsSection categories={categories} totalProjects={counts.projects} />}
       {h.showFeatured && <FeaturedProjects projects={featured} />}
       {h.showImpact && <ImpactSection items={settings.impact} />}
-      {h.showTimeline && <JourneySection events={timeline.slice(0, 8)} />}
+      {h.showTimeline && <JourneySection events={timeline.slice(0, 12)} />}
       {h.showArticles && <LatestArticles posts={posts} />}
       {h.showContact && <ContactSection settings={settings} />}
     </>

@@ -17,18 +17,21 @@ type Domain = { name: string; slug: string; color: string };
 export function SiteNav({ siteName, links, githubUrl, domains }: { siteName: string; links: NavLink[]; githubUrl?: string; domains: Domain[] }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useResetOn(pathname);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
+  // Toggle a CSS class only — never setState on scroll (that re-rendered the whole nav).
   useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
     let ticking = false;
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        setScrolled(window.scrollY > 20);
+        header.classList.toggle("is-scrolled", window.scrollY > 20);
         ticking = false;
       });
     };
@@ -70,22 +73,11 @@ export function SiteNav({ siteName, links, githubUrl, domains }: { siteName: str
       <a href="#main" className="sr-only z-[60] rounded-md bg-signal px-3 py-2 text-signal-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
         Skip to content
       </a>
-      <header className="fixed inset-x-0 top-0 z-50">
-        <div
-          className={cn(
-            "mx-auto transition-all duration-300",
-            scrolled ? "mt-2 max-w-[min(96vw,72rem)] px-2 sm:mt-3 sm:px-3" : "max-w-7xl px-4 sm:px-6 lg:px-8",
-          )}
-        >
-          <nav
-            className={cn(
-              "flex h-14 items-center gap-3 transition-all duration-300 sm:h-16 sm:gap-5",
-              scrolled ? "glass rounded-2xl border border-line-strong px-3 shadow-[0_16px_50px_-28px_rgba(0,0,0,0.55)] sm:px-4" : "border-b border-transparent bg-transparent",
-            )}
-            aria-label="Main"
-          >
+      <header ref={headerRef} className="site-header fixed inset-x-0 top-0 z-50 border-b border-transparent bg-transparent">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <nav className="flex h-14 items-center gap-3 sm:h-16 sm:gap-5" aria-label="Main">
             <Link href="/" className="group flex min-w-0 items-center gap-2.5 font-semibold" aria-label={`${siteName}, home`}>
-              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-signal/45 bg-signal/10 font-mono text-xs text-signal transition-all group-hover:bg-signal/20 group-hover:shadow-[0_0_24px_-6px_var(--glow-signal)]">
+              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-signal/45 bg-signal/10 font-mono text-xs text-signal transition-colors group-hover:bg-signal/20">
                 {initials || "~"}
               </span>
               <span className="hidden truncate tracking-tight sm:inline" style={{ fontVariationSettings: '"opsz" 36' }}>
@@ -102,9 +94,7 @@ export function SiteNav({ siteName, links, githubUrl, domains }: { siteName: str
                     aria-current={isActive(l.href) ? "page" : undefined}
                   >
                     {l.label}
-                    {isActive(l.href) && (
-                      <motion.span layoutId="nav-active" className="absolute inset-x-2.5 -bottom-0.5 h-[2px] rounded-full bg-signal" transition={{ type: "spring", stiffness: 420, damping: 34 }} />
-                    )}
+                    {isActive(l.href) && <span className="absolute inset-x-2.5 -bottom-0.5 h-[2px] rounded-full bg-signal" aria-hidden="true" />}
                   </Link>
                 </li>
               ))}
