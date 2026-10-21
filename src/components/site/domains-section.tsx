@@ -6,71 +6,85 @@ import { Counter, Stagger, StaggerItem } from "@/components/motion/primitives";
 import { Container, SectionHeader } from "./section-header";
 import { EmptyState } from "./empty-state";
 
-/**
- * Domains read like `kubectl get` output: one row per domain, a status column for
- * project count. Rows scan with a light sweep on hover (a style used nowhere else).
- */
+/** Large asymmetric domain tiles — not a table. */
 export function DomainsSection({ categories, totalProjects }: { categories: CategoryDTO[]; totalProjects: number }) {
   const shown = categories.filter((c) => c.showOnHome);
   if (!shown.length)
     return (
-      <section id="domains" className="scroll-mt-24 py-14 sm:py-20 md:py-28" aria-labelledby="domains-title">
+      <section id="domains" className="scroll-mt-24 py-16 sm:py-24 md:py-32" aria-labelledby="domains-title">
         <Container>
-          <SectionHeader id="domains-title" title="Engineering domains" />
+          <SectionHeader id="domains-title" index="01 — Domains" title="Engineering domains" />
           <EmptyState title="No domains published yet" body="Engineering domains created in the admin portal appear here, each linking to its projects." />
         </Container>
       </section>
     );
+
   return (
-    <section id="domains" className="scroll-mt-24 py-14 sm:py-20 md:py-28" aria-labelledby="domains-title">
-      <Container>
+    <section id="domains" className="scroll-mt-24 py-16 sm:py-24 md:py-32" aria-labelledby="domains-title">
+      <Container wide>
         <SectionHeader
           id="domains-title"
-          title="Engineering domains"
+          index="01 — Domains"
+          align="split"
+          title="Where I build"
           lede={
             <>
-              <Counter value={shown.length} /> areas I work across, with <Counter value={totalProjects} /> published project{totalProjects === 1 ? "" : "s"} between them.
+              <Counter value={shown.length} /> focus areas · <Counter value={totalProjects} /> published project{totalProjects === 1 ? "" : "s"}
             </>
           }
           action={{ href: "/projects", label: "All projects" }}
         />
 
-        <div className="overflow-hidden rounded-2xl border border-line bg-hull/40">
-          <div className="hidden grid-cols-[2.2rem_1.3fr_2fr_7rem_2rem] gap-4 border-b border-line px-5 py-3 font-mono text-xs text-fog md:grid" aria-hidden="true">
-            <span />
-            <span>name</span>
-            <span>focus</span>
-            <span className="text-right">projects</span>
-            <span />
-          </div>
-          <Stagger>
-            <ul className="contents">
-              {shown.map((c) => {
-                const Icon = iconFor(c.icon);
-                return (
-                  <StaggerItem as="li" key={c._id} className="border-b border-line last:border-b-0">
-                      <Link
-                        href={`/categories/${c.slug}`}
-                        className="group relative grid grid-cols-[2.2rem_1fr_auto] items-center gap-x-4 gap-y-1 overflow-hidden px-5 py-5 transition-colors hover:bg-hull-2/60 md:grid-cols-[2.2rem_1.3fr_2fr_7rem_2rem]"
-                        style={{ ["--c" as string]: c.color }}
-                      >
-                        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-[color-mix(in_srgb,var(--c)_14%,transparent)] to-transparent group-hover:animate-scan" aria-hidden="true" />
-                        <span className="grid h-9 w-9 place-items-center rounded-lg border" style={{ borderColor: `color-mix(in srgb, ${c.color} 45%, transparent)`, background: `color-mix(in srgb, ${c.color} 10%, transparent)`, color: c.color }}>
-                          <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-                        </span>
-                        <span className="text-lg font-medium tracking-tight">{c.name}</span>
-                        <span className="col-start-2 row-start-2 text-sm text-fog md:col-start-3 md:row-start-1">{c.tagline || c.description.slice(0, 120)}</span>
-                        <span className="col-start-3 row-start-1 text-right font-mono text-sm md:col-start-4">
-                          <span className={c.projectCount ? "text-frost" : "text-fog"}>{c.projectCount ?? 0}</span>
-                        </span>
-                        <ArrowUpRight className="hidden h-4 w-4 text-fog transition-[transform,color] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--c)] md:block" aria-hidden="true" />
-                      </Link>
-                  </StaggerItem>
-                );
-              })}
-            </ul>
-          </Stagger>
-        </div>
+        <Stagger gap={0.08} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:gap-4">
+          {shown.map((c, i) => {
+            const Icon = iconFor(c.icon);
+            const span =
+              shown.length === 1
+                ? "lg:col-span-12"
+                : i === 0
+                  ? "lg:col-span-7"
+                  : i === 1
+                    ? "lg:col-span-5"
+                    : i % 3 === 2
+                      ? "lg:col-span-4"
+                      : "lg:col-span-4";
+            return (
+              <StaggerItem key={c._id} className={span}>
+                <Link
+                  href={`/categories/${c.slug}`}
+                  className="group relative flex min-h-[11rem] flex-col justify-between overflow-hidden rounded-[1.35rem] border border-line bg-hull/50 p-6 transition-[border-color,transform,background] duration-500 hover:-translate-y-1 hover:border-signal/45 hover:bg-hull sm:min-h-[13rem] sm:p-7"
+                  style={{ ["--c" as string]: c.color }}
+                >
+                  <span
+                    className="pointer-events-none absolute -right-8 -bottom-10 h-40 w-40 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{ background: `radial-gradient(closest-side, color-mix(in srgb, ${c.color} 35%, transparent), transparent)` }}
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex items-start justify-between gap-4">
+                    <span
+                      className="grid h-11 w-11 place-items-center rounded-2xl border"
+                      style={{
+                        borderColor: `color-mix(in srgb, ${c.color} 45%, transparent)`,
+                        background: `color-mix(in srgb, ${c.color} 12%, transparent)`,
+                        color: c.color,
+                      }}
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <ArrowUpRight className="h-5 w-5 text-fog transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--c)]" />
+                  </div>
+                  <div className="relative mt-8">
+                    <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{c.name}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm text-fog">{c.tagline || c.description}</p>
+                    <p className="mt-4 font-mono text-xs text-fog">
+                      <span className="text-frost">{c.projectCount ?? 0}</span> projects
+                    </p>
+                  </div>
+                </Link>
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
       </Container>
     </section>
   );

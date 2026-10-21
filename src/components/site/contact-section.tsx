@@ -1,4 +1,5 @@
 import type { SettingsDTO } from "@/lib/content/types";
+import { Reveal } from "@/components/motion/primitives";
 import { Container } from "./section-header";
 import { SocialLinks, socialItems } from "./social-links";
 import { ContactForm } from "./contact-form";
@@ -7,32 +8,35 @@ export function ContactSection({ settings, headingLevel = 2 }: { settings: Setti
   const H = headingLevel === 1 ? "h1" : "h2";
   const hasLinks = socialItems(settings).length > 0;
   return (
-    <section id="contact" className="scroll-mt-24 py-20 md:py-28" aria-labelledby="contact-title">
-      <Container>
-        <div className="relative overflow-hidden rounded-3xl border border-line bg-hull/50 p-6 sm:p-10 lg:p-14">
-          <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,var(--glow-signal),transparent)]" aria-hidden="true" />
-          <div className="relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <H id="contact-title" className="text-3xl tracking-tight md:text-4xl" style={{ fontVariationSettings: '"opsz" 72' }}>
-                Let&apos;s talk infrastructure
-              </H>
-              <p className="mt-4 max-w-md text-lg text-fog">{settings.contact.note || "Have a role, a project, or a gnarly system problem? Send a message and I'll get back to you."}</p>
-              {hasLinks && (
-                <div className="mt-8">
-                  <p className="mb-3 text-sm text-fog">Elsewhere</p>
-                  <SocialLinks settings={settings} withLabels />
-                </div>
-              )}
-              {settings.location && <p className="mt-8 text-sm text-fog">Based in {settings.location}</p>}
-            </div>
-            <div>
+    <section id="contact" className="scroll-mt-24 border-t border-line py-16 sm:py-24 md:py-32" aria-labelledby="contact-title">
+      <Container wide>
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-8 xl:gap-16">
+          <Reveal variant="rise" className="lg:col-span-5">
+            <p className="mb-3 font-mono text-[11px] tracking-[0.22em] text-signal uppercase">06 — Contact</p>
+            <H id="contact-title" className="text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.02] tracking-tight" style={{ fontVariationSettings: '"opsz" 72' }}>
+              Let&apos;s talk systems
+            </H>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-fog sm:text-lg">
+              {settings.contact.note || "Have a role, a project, or a gnarly infrastructure problem? Send a message — I’ll reply by email."}
+            </p>
+            {hasLinks && (
+              <div className="mt-10">
+                <p className="mb-3 font-mono text-[11px] tracking-wider text-fog uppercase">Elsewhere</p>
+                <SocialLinks settings={settings} withLabels />
+              </div>
+            )}
+            {settings.location && <p className="mt-8 text-sm text-fog">Based in {settings.location}</p>}
+          </Reveal>
+
+          <Reveal variant="blur" delay={0.1} className="lg:col-span-7">
+            <div className="rounded-[1.5rem] border border-line bg-hull/40 p-5 sm:p-8 lg:p-10">
               {settings.contact.formEnabled ? (
                 <ContactForm />
               ) : (
-                <p className="rounded-xl border border-line p-6 text-fog">{hasLinks ? "The contact form is off. Reach me through the links on this page." : "Contact details haven't been published yet."}</p>
+                <p className="text-fog">{hasLinks ? "The contact form is off. Reach me through the links on this page." : "Contact details haven't been published yet."}</p>
               )}
             </div>
-          </div>
+          </Reveal>
         </div>
       </Container>
     </section>

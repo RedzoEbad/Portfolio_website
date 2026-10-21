@@ -28,6 +28,20 @@ export const THEMES = [
     swatches: ["#050507", "#00b4d8", "#ff2e63"],
     scheme: "dark" as const,
   },
+  {
+    id: "onyx",
+    label: "Onyx atelier",
+    blurb: "White onyx & angora with sage, turquoise, fuchsia",
+    swatches: ["#f6f3ee", "#1fb5a6", "#d946a8"],
+    scheme: "light" as const,
+  },
+  {
+    id: "maroon",
+    label: "Maroon grove",
+    blurb: "Maroon, dark green, and warm gold",
+    swatches: ["#0c1a14", "#8b2e3b", "#c9a227"],
+    scheme: "dark" as const,
+  },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];

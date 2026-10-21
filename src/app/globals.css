@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 /* Dark-based themes (for Tailwind `dark:` utilities) */
-@custom-variant dark (&:where(.dark, .dark *, .aubergine, .aubergine *, .neon, .neon *));
+@custom-variant dark (&:where(.dark, .dark *, .aubergine, .aubergine *, .neon, .neon *, .maroon, .maroon *));
 
 /* ---------- Design tokens ----------
-   Themes: light | dark | aubergine (ice / aubergine / marigold) | neon (jet / cerulean / rose) */
+   Themes: light | dark | aubergine | neon | onyx (white onyx / angora / sage / turquoise / fuchsia) */
 :root,
 .light {
   --abyss: #f3f6fb;
@@ -92,6 +92,50 @@
   --theme-blur: 60px;
 }
 
+/* White onyx · angora · sage · turquoise · fuchsia */
+.onyx {
+  --abyss: #f6f3ee;
+  --hull: #fffcf8;
+  --hull-2: #e9e0d4;
+  --line: rgb(62 52 44 / 0.1);
+  --line-strong: rgb(62 52 44 / 0.18);
+  --frost: #2a2622;
+  --fog: #7a7068;
+  --signal: #1fb5a6;
+  --signal-ink: #ffffff;
+  --ion: #7d9b76;
+  --flare: #d946a8;
+  --grid: rgb(127 155 118 / 0.12);
+  --glow-signal: rgb(31 181 166 / 0.2);
+  --glow-ion: rgb(125 155 118 / 0.18);
+  --glow-flare: rgb(217 70 168 / 0.14);
+  --ambient-a: rgb(31 181 166 / 0.16);
+  --ambient-b: rgb(217 70 168 / 0.1);
+  --theme-blur: 48px;
+}
+
+/* Maroon · dark green · warm gold */
+.maroon {
+  --abyss: #0c1a14;
+  --hull: #13241c;
+  --hull-2: #1b3228;
+  --line: rgb(201 162 39 / 0.14);
+  --line-strong: rgb(139 46 59 / 0.35);
+  --frost: #f3eee6;
+  --fog: #9aab9c;
+  --signal: #8b2e3b;
+  --signal-ink: #fff6f4;
+  --ion: #c9a227;
+  --flare: #a63d4d;
+  --grid: rgb(27 50 40 / 0.9);
+  --glow-signal: rgb(139 46 59 / 0.28);
+  --glow-ion: rgb(201 162 39 / 0.2);
+  --glow-flare: rgb(166 61 77 / 0.18);
+  --ambient-a: rgb(139 46 59 / 0.22);
+  --ambient-b: rgb(20 60 42 / 0.55);
+  --theme-blur: 70px;
+}
+
 @theme inline {
   --color-abyss: var(--abyss);
   --color-hull: var(--hull);
@@ -157,7 +201,8 @@
   }
   html.dark,
   html.aubergine,
-  html.neon { color-scheme: dark; }
+  html.neon,
+  html.maroon { color-scheme: dark; }
 
   /* Brief color tween when picking a theme (class toggled from ThemeToggle) */
   html.theme-animate,
@@ -198,7 +243,11 @@
     opacity: 0.85;
   }
   .aubergine body::before,
-  html.aubergine body::before {
+  html.aubergine body::before,
+  .onyx body::before,
+  html.onyx body::before,
+  .maroon body::before,
+  html.maroon body::before {
     animation: aurora-drift 22s ease-in-out infinite alternate;
   }
   .neon body::before,
@@ -237,7 +286,8 @@
     border: 1px solid var(--line);
   }
   .aubergine .glass,
-  .neon .glass {
+  .neon .glass,
+  .maroon .glass {
     background: color-mix(in srgb, var(--hull) 88%, transparent);
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--signal) 12%, transparent);
   }
@@ -280,6 +330,12 @@
     transform: translateY(-4px);
     border-color: color-mix(in srgb, var(--signal) 45%, var(--line));
     box-shadow: 0 18px 40px -28px var(--glow-signal);
+  }
+
+  /* Editorial hairline used between stacked home sections */
+  .section-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--signal) 35%, var(--line)), transparent);
   }
 
   .shimmer-text {
