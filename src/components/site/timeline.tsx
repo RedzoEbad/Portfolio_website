@@ -16,20 +16,21 @@ const KIND = {
 } as const;
 
 function EventTitle({ title, link }: { title: string; link: string }) {
-  if (isSafeHttpUrl(link)) {
-    return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-1 hover:text-signal">
-        {title}
-        <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100" aria-hidden="true" />
-      </a>
-    );
-  }
+  // Check internal paths first — isSafeHttpUrl's `u is string` guard would narrow `link` to never in the else branch.
   if (link.startsWith("/") && !link.startsWith("//")) {
     return (
       <Link href={link} className="group inline-flex items-center gap-1 hover:text-signal">
         {title}
         <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100" aria-hidden="true" />
       </Link>
+    );
+  }
+  if (isSafeHttpUrl(link)) {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-1 hover:text-signal">
+        {title}
+        <ArrowUpRight className="h-4 w-4 opacity-60 group-hover:opacity-100" aria-hidden="true" />
+      </a>
     );
   }
   return <>{title}</>;
