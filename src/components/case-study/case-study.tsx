@@ -80,7 +80,7 @@ function SectionBody({ s, p, related }: { s: ProjectSection; p: ProjectDTO; rela
       return (
         <>
           {s.content && <Markdown source={s.content} className="prose-lab mb-6" />}
-          <Gallery images={p.gallery} label={`${p.title} screenshots`} />
+          <Gallery images={p.gallery} layout="slider" label={`${p.title} screenshots`} />
         </>
       );
     case "diagrams":

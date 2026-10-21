@@ -1,7 +1,7 @@
 /** Shared, client-safe content constants. */
 
 export const CASE_STUDY_SECTIONS = [
-  { type: "overview", title: "Project overview", kind: "markdown", hint: "What the project does, in a few paragraphs." },
+  { type: "overview", title: "Case study", kind: "markdown", hint: "Paste or write the full case study here. Markdown works: headings, lists, code blocks and images." },
   { type: "problem", title: "Problem statement", kind: "markdown", hint: "The real engineering problem you set out to solve." },
   { type: "goals", title: "Goals and requirements", kind: "markdown", hint: "What you aimed to achieve; constraints you worked within." },
   { type: "architecture", title: "Architecture", kind: "markdown", hint: "The system design and how the components connect. Architecture images render below this text." },

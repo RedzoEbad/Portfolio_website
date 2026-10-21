@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Award, ExternalLink } from "lucide-react";
+import { Award, ExternalLink, UserRound } from "lucide-react";
 import { getCertifications, getSettings, getSkills, getTimeline } from "@/lib/queries/public";
 import { Container, PageIntro } from "@/components/site/section-header";
 import { Markdown } from "@/components/content/markdown";
@@ -11,6 +11,7 @@ import { iconFor } from "@/lib/content/icons";
 import { formatDate, isSafeHttpUrl } from "@/lib/utils";
 
 export const revalidate = 120;
+
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return { title: "About", description: s.about.intro || `About ${s.ownerName}.`, alternates: { canonical: "/about" } };
@@ -28,30 +29,47 @@ export default async function AboutPage() {
     <>
       <PageIntro title={`About ${settings.ownerName}`} lede={settings.about.intro || settings.role} />
       <Container className="pt-16">
-        <div className="grid gap-14 lg:grid-cols-[1fr_20rem]">
-          <div>
-            {settings.about.body ? <Markdown source={settings.about.body} /> : !hasBio && <EmptyState title="The bio hasn't been written yet" body="It's edited under Settings → About in the admin portal." />}
-          </div>
-          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            {settings.avatar?.url && (
-              <div className="relative aspect-square overflow-hidden rounded-2xl border border-line">
-                <SmartImage src={settings.avatar.url} alt={settings.avatar.alt || settings.ownerName} fill sizes="320px" className="object-cover" />
-              </div>
+        <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+          <div className="min-w-0">
+            {settings.about.body ? (
+              <Markdown source={settings.about.body} />
+            ) : (
+              !hasBio && <EmptyState title="The bio hasn't been written yet" body="It's edited under Settings → About in the admin portal." />
             )}
+          </div>
+
+          <aside className="space-y-5 lg:sticky lg:top-28">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-hull-2">
+              {settings.avatar?.url ? (
+                <SmartImage src={settings.avatar.url} alt={settings.avatar.alt || settings.ownerName} fill sizes="320px" className="object-cover" priority />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
+                  <span className="grid h-16 w-16 place-items-center rounded-full border border-line bg-hull text-fog">
+                    <UserRound className="h-8 w-8" aria-hidden="true" />
+                  </span>
+                  <p className="text-sm font-medium text-frost">Your photo</p>
+                  <p className="text-xs text-fog">Add a portrait in Admin → Settings → Profile → Portrait</p>
+                </div>
+              )}
+            </div>
+
             <div className="rounded-2xl border border-line bg-hull/50 p-5">
-              <p className="font-medium">{settings.ownerName}</p>
-              {settings.role && <p className="mt-1 text-sm text-fog">{settings.role}</p>}
+              <p className="text-lg font-semibold tracking-tight" style={{ fontVariationSettings: '"opsz" 36' }}>
+                {settings.ownerName}
+              </p>
+              {settings.role && <p className="mt-1.5 text-sm text-signal">{settings.role}</p>}
               {settings.location && <p className="mt-1 text-sm text-fog">{settings.location}</p>}
-              <SocialLinks settings={settings} className="mt-4" />
+              <SocialLinks settings={settings} className="mt-5" />
             </div>
           </aside>
         </div>
 
         {Object.keys(groups).length > 0 && (
           <section className="mt-28" aria-labelledby="skills-title">
-            <h2 id="skills-title" className="mb-10 text-3xl tracking-tight">
+            <h2 id="skills-title" className="mb-3 text-3xl tracking-tight">
               Skills and tools
             </h2>
+            <p className="mb-10 max-w-2xl text-fog">The platforms and tooling I use to design, secure and operate cloud systems.</p>
             <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
               {Object.entries(groups).map(([group, items]) => (
                 <div key={group}>
@@ -86,9 +104,7 @@ export default async function AboutPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium">{c.name}</p>
-                    <p className="text-sm text-fog">
-                      {[c.issuer, c.issuedAt && formatDate(c.issuedAt, { year: "numeric", month: "short" })].filter(Boolean).join(", ")}
-                    </p>
+                    <p className="text-sm text-fog">{[c.issuer, c.issuedAt && formatDate(c.issuedAt, { year: "numeric", month: "short" })].filter(Boolean).join(", ")}</p>
                     {isSafeHttpUrl(c.credentialUrl) && (
                       <a href={c.credentialUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-signal hover:underline">
                         Verify credential <ExternalLink className="h-3.5 w-3.5" />

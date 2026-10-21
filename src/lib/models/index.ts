@@ -179,9 +179,9 @@ const LinkSchema = new Schema({ label: { type: String, required: true }, href: {
 const SiteSettingsSchema = new Schema(
   {
     key: { type: String, default: "site", unique: true },
-    siteName: { type: String, default: "Your Name" },
-    ownerName: { type: String, default: "Your Name" },
-    role: { type: String, default: "Cloud, DevOps & AI Infrastructure Engineer" },
+    siteName: { type: String, default: "Ebad Khan" },
+    ownerName: { type: String, default: "Ebad Khan" },
+    role: { type: String, default: "Cloud and DevSecOps Engineer" },
     location: { type: String, default: "" },
     avatar: { type: ImageSchema, default: null },
     hero: {

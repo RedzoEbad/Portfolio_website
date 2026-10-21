@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-import { Eye, Loader2, Plus, Save, Send, Trash2, Upload } from "lucide-react";
+import { Eye, Loader2, Plus, Save, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { projectSchema } from "@/lib/validation/schemas";
 import { saveProjectAction } from "@/lib/actions/projects";
@@ -14,11 +14,12 @@ import { CASE_STUDY_SECTIONS, CODE_LANGUAGES, PROJECT_STATES, PROJECT_STATE_LABE
 import { Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { slugify } from "@/lib/utils";
-import { ImageField, uploadImage } from "./image-field";
+import { ImageField } from "./image-field";
+import { ProjectImageList } from "./project-images";
 import { MarkdownEditor } from "./markdown-editor";
 import { SortableList } from "./sortable-list";
 import { TagInput } from "./tag-input";
-import { Tabs, TabPanel, move, useUnsavedWarning } from "./editor-kit";
+import { Tabs, TabPanel, useUnsavedWarning } from "./editor-kit";
 import { Panel, StatusPill } from "./ui";
 
 type In = z.input<typeof projectSchema>;
@@ -81,6 +82,11 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
 
   const filteredProjects = projects.filter((p) => p._id !== id && p.title.toLowerCase().includes(relatedFilter.toLowerCase()));
 
+  const enableSection = (type: string) => {
+    const idx = getValues("sections")?.findIndex((s) => s.type === type) ?? -1;
+    if (idx >= 0) setValue(`sections.${idx}.enabled`, true, { shouldDirty: true });
+  };
+
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
       {/* Sticky action bar */}
@@ -115,7 +121,7 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
           { id: "basics", label: "Basics" },
           { id: "story", label: "Case study" },
           { id: "build", label: "Steps & code" },
-          { id: "media", label: "Media" },
+          { id: "media", label: "Screenshots & media" },
           { id: "publish", label: "Publishing & SEO" },
         ]}
       />
@@ -221,51 +227,120 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
         </Panel>
       </TabPanel>
 
-      {/* ---------------- Case study sections ---------------- */}
+      {/* ---------------- Case study ---------------- */}
       <TabPanel id="story" active={tab === "story"}>
-        <p className="text-sm text-fog">Turn sections on or off, rename them, and drag (or use the arrows) to change their order. Enabled sections with no content are hidden on the public page automatically.</p>
-        <SortableList
-          items={sections.fields}
-          keyOf={(f) => f.id}
-          onMove={(a, b) => sections.move(a, b)}
-          render={(f, i) => {
-            const meta = sectionMeta(f.type);
-            const enabled = watch(`sections.${i}.enabled`);
-            return (
-              <details className="group" open={meta?.kind === "markdown" && !!f.content}>
-                <summary className="flex cursor-pointer list-none items-center gap-3 py-1">
-                  <span onClick={(e) => e.preventDefault()}>
-                    <Controller control={control} name={`sections.${i}.enabled`} render={({ field }) => <Switch checked={!!field.value} onChange={field.onChange} label={`Show ${meta?.title ?? "section"}`} hideLabel />} />
-                  </span>
-                  <span className={enabled ? "font-medium" : "text-fog line-through"}>{watch(`sections.${i}.title`) || meta?.title}</span>
-                  <span className="ml-auto text-xs text-fog">{meta?.kind === "structured" ? "From structured fields" : "Markdown"}</span>
-                </summary>
-                <div className="mt-3 space-y-3 pb-2">
-                  <Input aria-label="Section title" placeholder={meta?.title} {...register(`sections.${i}.title`)} />
-                  <p className="text-xs text-fog">{meta?.hint}</p>
-                  {(meta?.kind === "markdown" || ["implementation", "code", "screenshots", "diagrams"].includes(f.type)) && (
-                    <Controller
-                      control={control}
-                      name={`sections.${i}.content`}
-                      render={({ field }) => <MarkdownEditor value={field.value ?? ""} onChange={field.onChange} rows={meta?.kind === "markdown" ? 8 : 3} uploadsEnabled={uploadsEnabled} placeholder={meta?.kind === "structured" ? "Optional intro text shown above this section" : undefined} />}
+        {(() => {
+          const overviewIndex = sections.fields.findIndex((f) => f.type === "overview");
+          return (
+            <Panel title="Case study" description="Paste your full case study below (Markdown). This is what visitors read on the project page.">
+              {overviewIndex >= 0 ? (
+                <Controller
+                  control={control}
+                  name={`sections.${overviewIndex}.content`}
+                  render={({ field }) => (
+                    <MarkdownEditor
+                      value={field.value ?? ""}
+                      onChange={(v) => {
+                        field.onChange(v);
+                        if (v.trim()) setValue(`sections.${overviewIndex}.enabled`, true);
+                      }}
+                      rows={22}
+                      uploadsEnabled={uploadsEnabled}
+                      placeholder={"# Project title\n\nPaste your case study here…\n\n## Problem\n\n## Architecture\n\n## What I built\n\n## Outcomes"}
                     />
                   )}
-                </div>
-              </details>
-            );
-          }}
+                />
+              ) : (
+                <p className="text-sm text-fog">
+                  Case study section is missing.{" "}
+                  <button
+                    type="button"
+                    className="text-signal underline"
+                    onClick={() => sections.append({ type: "overview", title: "Case study", enabled: true, content: "" })}
+                  >
+                    Add it
+                  </button>
+                </p>
+              )}
+            </Panel>
+          );
+        })()}
+
+        <Controller
+          control={control}
+          name="gallery"
+          render={({ field }) => (
+            <ProjectImageList
+              title="Project screenshots"
+              description="Upload screenshots from your computer. They appear in a gallery on the public case study page."
+              emptyHint="No screenshots yet. Click Choose screenshots to pick PNG, JPG or WebP files."
+              list={field.value ?? []}
+              onChange={field.onChange}
+              uploadsEnabled={uploadsEnabled}
+              error={!!errors.gallery}
+              onUploaded={(next) => {
+                if (next.length) enableSection("screenshots");
+              }}
+            />
+          )}
         />
-        {sections.fields.length < CASE_STUDY_SECTIONS.length && (
-          <Button
-            variant="secondary"
-            onClick={() => {
-              const have = new Set(getValues("sections")?.map((s) => s.type));
-              CASE_STUDY_SECTIONS.filter((s) => !have.has(s.type)).forEach((s) => sections.append({ type: s.type, title: s.title, enabled: true, content: "" }));
-            }}
-          >
-            Restore missing sections
-          </Button>
-        )}
+
+        <details className="group rounded-2xl border border-line bg-hull/40 open:bg-hull/60">
+          <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-frost sm:px-6">
+            Optional: break the case study into named sections
+            <span className="mt-1 block text-xs font-normal text-fog">Problem, architecture, challenges, lessons, etc. Leave closed if you only use the paste box above.</span>
+          </summary>
+          <div className="space-y-4 border-t border-line px-5 py-4 sm:px-6">
+            <p className="text-sm text-fog">Turn sections on or off, rename them, and drag to reorder. Empty enabled sections stay hidden on the public page.</p>
+            {(() => {
+              const optional = sections.fields.map((f, i) => ({ f, i })).filter(({ f }) => f.type !== "overview");
+              return (
+                <SortableList
+                  items={optional}
+                  keyOf={({ f }) => f.id}
+                  onMove={(a, b) => sections.move(optional[a].i, optional[b].i)}
+                  render={({ f, i }) => {
+                    const meta = sectionMeta(f.type);
+                    const enabled = watch(`sections.${i}.enabled`);
+                    return (
+                      <details className="group/sec" open={meta?.kind === "markdown" && !!f.content}>
+                        <summary className="flex cursor-pointer list-none items-center gap-3 py-1">
+                          <span onClick={(e) => e.preventDefault()}>
+                            <Controller control={control} name={`sections.${i}.enabled`} render={({ field }) => <Switch checked={!!field.value} onChange={field.onChange} label={`Show ${meta?.title ?? "section"}`} hideLabel />} />
+                          </span>
+                          <span className={enabled ? "font-medium" : "text-fog line-through"}>{watch(`sections.${i}.title`) || meta?.title}</span>
+                          <span className="ml-auto text-xs text-fog">{meta?.kind === "structured" ? "From structured fields" : "Markdown"}</span>
+                        </summary>
+                        <div className="mt-3 space-y-3 pb-2">
+                          <Input aria-label="Section title" placeholder={meta?.title} {...register(`sections.${i}.title`)} />
+                          <p className="text-xs text-fog">{meta?.hint}</p>
+                          {(meta?.kind === "markdown" || ["implementation", "code", "screenshots", "diagrams"].includes(f.type)) && (
+                            <Controller
+                              control={control}
+                              name={`sections.${i}.content`}
+                              render={({ field }) => <MarkdownEditor value={field.value ?? ""} onChange={field.onChange} rows={meta?.kind === "markdown" ? 8 : 3} uploadsEnabled={uploadsEnabled} placeholder={meta?.kind === "structured" ? "Optional intro text shown above this section" : undefined} />}
+                            />
+                          )}
+                        </div>
+                      </details>
+                    );
+                  }}
+                />
+              );
+            })()}
+            {sections.fields.length < CASE_STUDY_SECTIONS.length && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const have = new Set(getValues("sections")?.map((s) => s.type));
+                  CASE_STUDY_SECTIONS.filter((s) => !have.has(s.type)).forEach((s) => sections.append({ type: s.type, title: s.title, enabled: true, content: "" }));
+                }}
+              >
+                Restore missing sections
+              </Button>
+            )}
+          </div>
+        </details>
       </TabPanel>
 
       {/* ---------------- Steps & code ---------------- */}
@@ -327,82 +402,48 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
         </Panel>
       </TabPanel>
 
-      {/* ---------------- Media ---------------- */}
+      {/* ---------------- Screenshots & media ---------------- */}
       <TabPanel id="media" active={tab === "media"}>
-        <Panel title="Cover image" description="Used on cards and at the top of the case study. Upload a screenshot or paste a URL. 16:9 or wider works best.">
+        <Panel title="Cover image" description="Main image on project cards and at the top of the case study. Upload a file or paste a URL.">
           <Controller control={control} name="coverImage" render={({ field }) => <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="Cover image" />} />
           {errors.coverImage && <p className="mt-2 text-xs text-flare">{(errors.coverImage as { url?: { message?: string } }).url?.message ?? "Check the cover image."}</p>}
         </Panel>
-        {(["gallery", "architectureImages"] as const).map((name) => (
-          <Controller
-            key={name}
-            control={control}
-            name={name}
-            render={({ field }) => {
-              const list = field.value ?? [];
-              const isGallery = name === "gallery";
-              return (
-                <Panel
-                  title={isGallery ? "Screenshots" : "Architecture diagrams"}
-                  description={isGallery ? "Upload screenshots from your computer (PNG, JPG, WebP). They open in a lightbox on the case study." : "System diagrams. Shown full width."}
-                  actions={
-                    <div className="flex flex-wrap gap-2">
-                      <label className="inline-flex">
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                          multiple
-                          className="sr-only"
-                          onChange={async (e) => {
-                            const files = Array.from(e.target.files ?? []);
-                            e.target.value = "";
-                            if (!files.length) return;
-                            const toastId = toast.loading(`Uploading ${files.length} image${files.length === 1 ? "" : "s"}…`);
-                            try {
-                              const uploaded = [];
-                              for (const f of files) uploaded.push(await uploadImage(f));
-                              field.onChange([...list, ...uploaded]);
-                              toast.success(`Added ${uploaded.length} screenshot${uploaded.length === 1 ? "" : "s"}.`, { id: toastId });
-                            } catch (err) {
-                              toast.error((err as Error).message, { id: toastId });
-                            }
-                          }}
-                        />
-                        <span className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line-strong bg-hull-2 px-3 text-sm font-medium text-frost hover:border-signal/50">
-                          <Upload className="h-3.5 w-3.5" /> Upload {isGallery ? "screenshots" : "images"}
-                        </span>
-                      </label>
-                      <Button variant="secondary" size="sm" onClick={() => field.onChange([...list, { url: "", alt: "", caption: "" }])}>
-                        <Plus className="h-3.5 w-3.5" /> Add by URL
-                      </Button>
-                    </div>
-                  }
-                >
-                  {list.length === 0 ? (
-                    <p className="text-sm text-fog">{isGallery ? "No screenshots yet. Use Upload screenshots to pick files from your computer." : "No images yet."}</p>
-                  ) : (
-                    <SortableList
-                      items={list}
-                      keyOf={(img, i) => `${i}-${img.url}`}
-                      onMove={(a, b) => field.onChange(move(list, a, b))}
-                      render={(img, i) => (
-                        <ImageField
-                          compact
-                          withCaption
-                          value={img.url ? img : { url: "", alt: img.alt, caption: img.caption }}
-                          onChange={(v) => field.onChange(v ? list.map((x, j) => (j === i ? v : x)) : list.filter((_, j) => j !== i))}
-                          uploadsEnabled={uploadsEnabled}
-                          label={`Image ${i + 1}`}
-                        />
-                      )}
-                    />
-                  )}
-                  {errors[name] && <p className="mt-2 text-xs text-flare">Every image needs a valid URL or upload. Remove empty rows.</p>}
-                </Panel>
-              );
-            }}
-          />
-        ))}
+        <Controller
+          control={control}
+          name="gallery"
+          render={({ field }) => (
+            <ProjectImageList
+              title="Project screenshots"
+              description="Upload as many screenshots as you want. Shown in a lightbox gallery on the case study."
+              emptyHint="No screenshots yet. Click Choose screenshots to pick files from your computer."
+              list={field.value ?? []}
+              onChange={field.onChange}
+              uploadsEnabled={uploadsEnabled}
+              error={!!errors.gallery}
+              onUploaded={(next) => {
+                if (next.length) enableSection("screenshots");
+              }}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="architectureImages"
+          render={({ field }) => (
+            <ProjectImageList
+              title="Architecture diagrams"
+              description="System diagrams shown full width on the case study."
+              emptyHint="No diagrams yet. Upload PNG, JPG or WebP files."
+              list={field.value ?? []}
+              onChange={field.onChange}
+              uploadsEnabled={uploadsEnabled}
+              error={!!errors.architectureImages}
+              onUploaded={(next) => {
+                if (next.length) enableSection("diagrams");
+              }}
+            />
+          )}
+        />
       </TabPanel>
 
       {/* ---------------- Publishing ---------------- */}

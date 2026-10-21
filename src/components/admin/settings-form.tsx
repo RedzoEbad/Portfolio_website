@@ -107,8 +107,8 @@ export function SettingsForm({ initial, uploadsEnabled }: { initial: In; uploads
             </Field>
           </div>
         </Panel>
-        <Panel title="Portrait" description="Shown on the About page.">
-          <Controller control={control} name="avatar" render={({ field }) => <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="Portrait" />} />
+        <Panel title="Your photo" description="Shown on the About page beside your bio. Upload a clear portrait (square or portrait crop works best).">
+          <Controller control={control} name="avatar" render={({ field }) => <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="Portrait photo" />} />
         </Panel>
       </TabPanel>
 
