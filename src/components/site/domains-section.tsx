@@ -14,7 +14,7 @@ export function DomainsSection({ categories, totalProjects }: { categories: Cate
   const shown = categories.filter((c) => c.showOnHome);
   if (!shown.length)
     return (
-      <section id="domains" className="scroll-mt-24 py-20 md:py-28" aria-labelledby="domains-title">
+      <section id="domains" className="scroll-mt-24 py-14 sm:py-20 md:py-28" aria-labelledby="domains-title">
         <Container>
           <SectionHeader id="domains-title" title="Engineering domains" />
           <EmptyState title="No domains published yet" body="Engineering domains created in the admin portal appear here, each linking to its projects." />
@@ -22,7 +22,7 @@ export function DomainsSection({ categories, totalProjects }: { categories: Cate
       </section>
     );
   return (
-    <section id="domains" className="scroll-mt-24 py-20 md:py-28" aria-labelledby="domains-title">
+    <section id="domains" className="scroll-mt-24 py-14 sm:py-20 md:py-28" aria-labelledby="domains-title">
       <Container>
         <SectionHeader
           id="domains-title"

@@ -68,11 +68,16 @@ export async function recordMediaAction(input: unknown): Promise<ActionResult> {
 
 /**
  * Saves an image under public/uploads when Cloudinary isn't configured.
- * Works for local/dev and self-hosted deploys with a writable filesystem.
+ * Local-only: Vercel has no persistent disk, so uploads must use Cloudinary there.
  */
 export async function uploadLocalImageAction(formData: FormData): Promise<ActionResult<ImageInput>> {
   try {
     await requireAdmin();
+    if (process.env.VERCEL) {
+      return fail(
+        "On Vercel, images must use Cloudinary. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET in Project → Settings → Environment Variables, redeploy, then re-upload your screenshots.",
+      );
+    }
     const file = formData.get("file");
     if (!(file instanceof File)) return fail("Choose an image file to upload.");
     if (!ALLOWED_MIME[file.type]) return fail("Choose an image file (PNG, JPG, WebP, GIF or AVIF).");

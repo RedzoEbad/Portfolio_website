@@ -210,11 +210,11 @@ export function SettingsForm({ initial, uploadsEnabled }: { initial: In; uploads
         </Panel>
         <Panel title="Contact">
           <div className="space-y-5">
-            <Field label="Email" htmlFor="c-email" error={e.contact?.email?.message} hint="Private unless you turn on the switch below.">
+            <Field label="Email" htmlFor="c-email" error={e.contact?.email?.message} hint="Used for form notifications (with RESEND_API_KEY). Private unless you turn on the switch below.">
               <Input id="c-email" type="email" {...register("contact.email")} />
             </Field>
             <Controller control={control} name="contact.showEmail" render={({ field }) => <Switch checked={!!field.value} onChange={field.onChange} label="Show email publicly" description="Adds a mailto link to the contact section and footer." />} />
-            <Controller control={control} name="contact.formEnabled" render={({ field }) => <Switch checked={!!field.value} onChange={field.onChange} label="Enable the contact form" description="Messages are saved to Messages in this admin portal." />} />
+            <Controller control={control} name="contact.formEnabled" render={({ field }) => <Switch checked={!!field.value} onChange={field.onChange} label="Enable the contact form" description="Saves to Admin → Messages, and emails you when Resend is configured." />} />
             <Field label="Contact note" htmlFor="c-note" hint="Shown beside the form.">
               <Textarea id="c-note" rows={2} {...register("contact.note")} />
             </Field>

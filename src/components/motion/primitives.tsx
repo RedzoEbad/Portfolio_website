@@ -10,25 +10,28 @@ import { useMediaQuery, useSafeReducedMotion } from "@/lib/hooks";
  * Variants are intentionally different per component family.
  */
 const VARIANTS = {
-  rise: { hidden: { opacity: 0, y: 18 }, shown: { opacity: 1, y: 0 } },
+  rise: { hidden: { opacity: 0, y: 22 }, shown: { opacity: 1, y: 0 } },
   clip: { hidden: { clipPath: "inset(0 0 100% 0)" }, shown: { clipPath: "inset(0 0 0% 0)" } },
   wipe: { hidden: { clipPath: "inset(0 100% 0 0)" }, shown: { clipPath: "inset(0 0% 0 0)" } },
   fade: { hidden: { opacity: 0 }, shown: { opacity: 1 } },
+  scale: { hidden: { opacity: 0, scale: 0.94 }, shown: { opacity: 1, scale: 1 } },
+  blur: { hidden: { opacity: 0, filter: "blur(10px)", y: 12 }, shown: { opacity: 1, filter: "blur(0px)", y: 0 } },
 } as const;
 
 export function Reveal({ children, variant = "rise", delay = 0, className, as = "div", ...rest }: { children: ReactNode; variant?: keyof typeof VARIANTS; delay?: number; className?: string; as?: "div" | "section" | "li" | "article" } & Omit<HTMLMotionProps<"div">, "children">) {
   const reduce = useSafeReducedMotion();
   const Comp = motion[as] as typeof motion.div;
   if (reduce) return <Comp className={className}>{children}</Comp>;
+  const long = variant === "clip" || variant === "wipe" || variant === "blur";
   return (
     <Comp
       data-reveal=""
       className={className}
       initial="hidden"
       whileInView="shown"
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px", amount: 0.15 }}
       variants={VARIANTS[variant]}
-      transition={{ duration: variant === "clip" || variant === "wipe" ? 0.9 : 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+      transition={{ duration: long ? 0.85 : 0.62, ease: [0.22, 1, 0.36, 1], delay }}
       {...rest}
     >
       {children}
@@ -48,7 +51,14 @@ export function Stagger({ children, className, gap = 0.06 }: { children: ReactNo
 export function StaggerItem({ children, className, as = "div" }: { children: ReactNode; className?: string; as?: "div" | "li" }) {
   const Comp = motion[as] as typeof motion.div;
   return (
-    <Comp data-reveal="" className={className} variants={{ hidden: { opacity: 0, x: -10 }, shown: { opacity: 1, x: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } } }}>
+    <Comp
+      data-reveal=""
+      className={className}
+      variants={{
+        hidden: { opacity: 0, y: 14, scale: 0.98 },
+        shown: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+      }}
+    >
       {children}
     </Comp>
   );

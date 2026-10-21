@@ -35,10 +35,16 @@ export async function uploadImage(file: File): Promise<ImageInput> {
     return { url: json.secure_url, alt: "", caption: "", width: json.width, height: json.height };
   }
 
+  // Cloudinary not configured — try local disk (dev only; blocked on Vercel).
   const fd = new FormData();
   fd.append("file", file);
   const local = await uploadLocalImageAction(fd);
-  if (!local.ok) throw new Error(local.error || "The upload failed.");
+  if (!local.ok) {
+    throw new Error(
+      local.error ||
+        "Image uploads need Cloudinary on Vercel. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET, then redeploy.",
+    );
+  }
   if (!local.data) throw new Error("The upload failed.");
   return local.data;
 }

@@ -1,12 +1,13 @@
 "use server";
 
 import { connectDB } from "../db";
+import { notifyContactEmail } from "../email";
 import { ContactMessage, SiteSettings } from "../models";
 import { clientIp, rateLimit } from "../rate-limit";
 import { contactSchema } from "../validation/schemas";
 import { fail, handleError, zodFail, type ActionResult } from "./result";
 
-/** Public contact form. Spam protection: honeypot, minimum fill time, per-IP rate limit. Messages are stored for the admin inbox. */
+/** Public contact form. Spam protection: honeypot, minimum fill time, per-IP rate limit. Messages are stored for the admin inbox and emailed when Resend is configured. */
 export async function submitContactAction(input: unknown): Promise<ActionResult> {
   try {
     const parsed = contactSchema.safeParse(input);
@@ -17,7 +18,8 @@ export async function submitContactAction(input: unknown): Promise<ActionResult>
     const { startedAt, company: _hp, ...msg } = parsed.data;
     void _hp;
     const elapsed = Date.now() - startedAt;
-    if (elapsed < 3000 || elapsed > 1000 * 60 * 60 * 6) return fail("The form expired or was sent too quickly. Reload the page and try again.");
+    // 1.5s min blocks most bots; 6h max covers long open tabs without being harsh.
+    if (elapsed < 1500 || elapsed > 1000 * 60 * 60 * 6) return fail("The form expired or was sent too quickly. Reload the page and try again.");
 
     await connectDB();
     const settings = await SiteSettings.findOne({ key: "site" }).select("contact").lean();
@@ -27,6 +29,18 @@ export async function submitContactAction(input: unknown): Promise<ActionResult>
     if (!limit.ok) return fail("You've sent several messages recently. Try again in an hour.");
 
     await ContactMessage.create(msg);
+
+    const notifyTo = settings?.contact?.email?.trim() || process.env.CONTACT_TO_EMAIL?.trim() || "";
+    if (notifyTo) {
+      await notifyContactEmail({
+        to: notifyTo,
+        visitorName: msg.name,
+        visitorEmail: msg.email,
+        subject: msg.subject,
+        message: msg.message,
+      });
+    }
+
     return { ok: true, message: "Thanks — your message was sent. I'll reply by email." };
   } catch (err) {
     return handleError(err);

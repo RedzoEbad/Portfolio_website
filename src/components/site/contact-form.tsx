@@ -10,11 +10,10 @@ import { Field, Input, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 
 export function ContactForm() {
-  const [startedAt] = useState(() => Date.now());
   const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
-  const { register, handleSubmit, formState, reset, setError } = useForm<ContactInput>({
+  const { register, handleSubmit, formState, reset, setError, setValue } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", subject: "", message: "", company: "", startedAt },
+    defaultValues: { name: "", email: "", subject: "", message: "", company: "", startedAt: Date.now() },
   });
   const e = formState.errors;
 
@@ -42,13 +41,24 @@ export function ContactForm() {
   return (
     <form
       noValidate
+      onFocusCapture={() => {
+        // Refresh anti-bot timer on first interaction so long-open tabs still work.
+        if (!formState.isDirty) setValue("startedAt", Date.now(), { shouldDirty: false });
+      }}
       onSubmit={handleSubmit(async (values) => {
         setStatus(null);
-        const res = await submitContactAction(values);
-        if (res.ok) setStatus({ ok: true, message: res.message ?? "Message sent." });
-        else {
-          Object.entries(res.fieldErrors ?? {}).forEach(([k, msg]) => setError(k as keyof ContactInput, { message: msg }));
-          setStatus({ ok: false, message: res.error });
+        try {
+          const res = await submitContactAction(values);
+          if (res.ok) setStatus({ ok: true, message: res.message ?? "Message sent." });
+          else {
+            Object.entries(res.fieldErrors ?? {}).forEach(([k, msg]) => setError(k as keyof ContactInput, { message: msg }));
+            setStatus({ ok: false, message: res.error || "Could not send. Please try again." });
+          }
+        } catch {
+          setStatus({
+            ok: false,
+            message: "Could not reach the server. Refresh the page and try again.",
+          });
         }
       })}
       className="space-y-5"

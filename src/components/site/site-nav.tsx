@@ -71,18 +71,18 @@ export function SiteNav({ siteName, links, githubUrl, domains }: { siteName: str
         Skip to content
       </a>
       <header className={cn("fixed inset-x-0 top-0 z-50 transition-colors duration-200", scrolled ? "glass border-x-0 border-t-0" : "border-b border-transparent bg-transparent")}>
-        <nav className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8" aria-label="Main">
-          <Link href="/" className="group flex items-center gap-2.5 font-semibold" aria-label={`${siteName}, home`}>
-            <span className="relative grid h-8 w-8 place-items-center rounded-lg border border-signal/50 bg-signal/10 font-mono text-xs text-signal transition-colors group-hover:bg-signal/20">
+        <nav className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:h-16 sm:gap-6 sm:px-6 lg:px-8" aria-label="Main">
+          <Link href="/" className="group flex min-w-0 items-center gap-2.5 font-semibold" aria-label={`${siteName}, home`}>
+            <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-signal/50 bg-signal/10 font-mono text-xs text-signal transition-colors group-hover:bg-signal/20 group-hover:shadow-[0_0_20px_-4px_var(--glow-signal)]">
               {initials || "~"}
-              <span className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full bg-signal" />
+              <span className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full bg-signal pulse-dot" />
             </span>
-            <span className="hidden tracking-tight sm:inline" style={{ fontVariationSettings: '"opsz" 36' }}>
+            <span className="hidden truncate tracking-tight sm:inline" style={{ fontVariationSettings: '"opsz" 36' }}>
               {siteName}
             </span>
           </Link>
 
-          <ul className="ml-4 hidden items-center gap-1 md:flex">
+          <ul className="ml-2 hidden items-center gap-1 lg:ml-4 md:flex">
             {links.map((l) => (
               <li key={l.href} className="relative">
                 <Link href={l.href} className={cn("relative block rounded-md px-3 py-2 text-sm transition-colors", isActive(l.href) ? "text-frost" : "text-fog hover:text-frost")} aria-current={isActive(l.href) ? "page" : undefined}>

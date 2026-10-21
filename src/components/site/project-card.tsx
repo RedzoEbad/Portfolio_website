@@ -117,7 +117,7 @@ export function ProjectFeature({ p, flip = false, priority }: { p: ProjectCardDT
 /** Compact tile for the grid view and related projects. */
 export function ProjectTile({ p }: { p: ProjectCardDTO }) {
   return (
-    <PointerGlow className="group h-full rounded-2xl border border-line bg-hull/60 transition-colors hover:border-line-strong">
+    <PointerGlow className="lift-card group h-full rounded-2xl border border-line bg-hull/60">
       <article className="relative flex h-full flex-col">
         <div className="relative aspect-[16/9] overflow-hidden rounded-t-2xl border-b border-line bg-hull-2">
           <Cover p={p} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
