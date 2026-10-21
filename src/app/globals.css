@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Design tokens ----------
+   Dark is the primary theme. Light flips to cool paper. */
+:root {
+  --abyss: #f3f6fb;
+  --hull: #ffffff;
+  --hull-2: #e9eef7;
+  --line: rgb(10 16 36 / 0.1);
+  --line-strong: rgb(10 16 36 / 0.18);
+  --frost: #0a1024;
+  --fog: #4b5675;
+  --signal: #067a8c;
+  --signal-ink: #ffffff;
+  --ion: #6d3fe0;
+  --flare: #c2367c;
+  --grid: rgb(10 16 36 / 0.05);
+  --glow-signal: rgb(7 145 166 / 0.18);
+  --glow-ion: rgb(109 63 224 / 0.14);
+}
+
+.dark {
+  --abyss: #050816;
+  --hull: #0b1228;
+  --hull-2: #111a36;
+  --line: rgb(147 160 191 / 0.14);
+  --line-strong: rgb(147 160 191 / 0.26);
+  --frost: #eef3ff;
+  --fog: #93a0bf;
+  --signal: #2ee6f5;
+  --signal-ink: #02242a;
+  --ion: #9d6bff;
+  --flare: #e2559c;
+  --grid: rgb(147 160 191 / 0.06);
+  --glow-signal: rgb(46 230 245 / 0.16);
+  --glow-ion: rgb(157 107 255 / 0.16);
+}
+
+@theme inline {
+  --color-abyss: var(--abyss);
+  --color-hull: var(--hull);
+  --color-hull-2: var(--hull-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-frost: var(--frost);
+  --color-fog: var(--fog);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-ion: var(--ion);
+  --color-flare: var(--flare);
+
+  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Type scale (ratio ~1.25, display steps larger) */
+  --text-xs: 0.78rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --text-4xl: 3.75rem;
+  --text-5xl: clamp(3rem, 7.2vw, 6.25rem);
+
+  --animate-scan: scan 1.4s ease-out;
+}
+
+@keyframes scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    /* Native wheel/trackpad scroll. Smooth behavior queues every tick and feels delayed. */
+    scroll-behavior: auto;
+  }
+  html.dark { color-scheme: dark; }
+  body {
+    background: var(--abyss);
+    color: var(--frost);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    font-variation-settings: "opsz" 14;
+    overscroll-behavior-y: auto;
+  }
+  h1, h2, h3, h4 {
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  ::selection { background: color-mix(in srgb, var(--signal) 35%, transparent); }
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  code, kbd, pre { font-family: var(--font-mono); }
+}
+
+@layer components {
+  /* Infrastructure-diagram grid; masked so it fades out at the edges */
+  .bg-grid {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .mask-fade {
+    mask-image: radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%);
+  }
+  /* Opaque mix, not live backdrop-filter: blur on sticky/fixed bars re-samples the
+     whole page every scroll frame and is the usual cause of delayed wheel input. */
+  .glass {
+    background: color-mix(in srgb, var(--hull) 92%, transparent);
+    border: 1px solid var(--line);
+  }
+  /* Pointer-tracked glow: set --mx/--my on the element */
+  .pointer-glow {
+    position: relative;
+    isolation: isolate;
+  }
+  .pointer-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 300ms;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), var(--glow-signal), transparent 60%);
+  }
+  .pointer-glow:hover::before { opacity: 1; }
+
+  /* Hero headline entrance (CSS so it needs no JS) */
+  .hero-line {
+    font-variation-settings: "opsz" 96, "wght" 620;
+    animation: hero-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes hero-rise {
+    from { transform: translateY(105%); font-variation-settings: "opsz" 12, "wght" 500; }
+    to { transform: translateY(0); font-variation-settings: "opsz" 96, "wght" 620; }
+  }
+  .pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+
+  /* Long-form content (case studies, articles) */
+  .prose-lab { max-width: 70ch; color: var(--frost); }
+  .prose-lab > * + * { margin-top: 1.1em; }
+  .prose-lab p, .prose-lab li { color: color-mix(in srgb, var(--frost) 86%, var(--fog)); line-height: 1.75; text-wrap: pretty; }
+  .prose-lab h2 { font-size: var(--text-2xl); margin-top: 2em; }
+  .prose-lab h3 { font-size: var(--text-xl); margin-top: 1.6em; }
+  .prose-lab h4 { font-size: var(--text-lg); margin-top: 1.4em; }
+  .prose-lab a { color: var(--signal); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .prose-lab ul { list-style: none; padding-left: 0; }
+  .prose-lab ul > li { position: relative; padding-left: 1.4em; }
+  .prose-lab ul > li::before { content: ""; position: absolute; left: 0.2em; top: 0.72em; width: 6px; height: 6px; border-radius: 1px; background: var(--signal); transform: rotate(45deg); }
+  .prose-lab ol { list-style: decimal; padding-left: 1.4em; }
+  .prose-lab ol > li::marker { color: var(--fog); font-family: var(--font-mono); font-size: 0.85em; }
+  .prose-lab li + li { margin-top: 0.4em; }
+  .prose-lab blockquote { border-left: 2px solid var(--ion); padding-left: 1em; color: var(--fog); }
+  .prose-lab :not(pre) > code { font-size: 0.86em; padding: 0.12em 0.38em; border-radius: 5px; background: var(--hull-2); border: 1px solid var(--line); }
+  .prose-lab img { border-radius: 12px; border: 1px solid var(--line); }
+  .prose-lab table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .prose-lab th, .prose-lab td { border-bottom: 1px solid var(--line); padding: 0.6em 0.5em; text-align: left; }
+  .prose-lab hr { border: 0; border-top: 1px solid var(--line); }
+
+  /* sugar-high token colors */
+  .sh {
+    --sh-class: #9d6bff;
+    --sh-identifier: #dce4f7;
+    --sh-sign: #7d89a8;
+    --sh-property: #2ee6f5;
+    --sh-entity: #67b7ff;
+    --sh-jsxliterals: #c8d3ee;
+    --sh-string: #7ee0b5;
+    --sh-keyword: #e2559c;
+    --sh-comment: #5d6a8a;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
