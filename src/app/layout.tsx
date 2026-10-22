@@ -33,18 +33,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f3f6fb",
+  themeColor: "#050507",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
-/** Apply stored theme (or cool paper / light default) before paint to avoid a flash. */
-const themeBoot = `(function(){try{var t=localStorage.getItem('theme')||'light';var a=['light','dark','aubergine','neon','onyx','maroon'];document.documentElement.classList.remove.apply(document.documentElement.classList,a);if(a.indexOf(t)>=0)document.documentElement.classList.add(t);else document.documentElement.classList.add('light');}catch(e){document.documentElement.classList.add('light')}})();`;
+/** Apply stored theme (or neon default) before paint to avoid a flash. */
+const themeBoot = `(function(){try{var t=localStorage.getItem('theme')||'neon';var a=['light','dark','aubergine','neon','onyx','maroon'];document.documentElement.classList.remove.apply(document.documentElement.classList,a);if(a.indexOf(t)>=0)document.documentElement.classList.add(t);else document.documentElement.classList.add('neon');}catch(e){document.documentElement.classList.add('neon')}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="light scroll-auto" suppressHydrationWarning>
+    <html lang="en" className="neon scroll-auto" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
         <noscript>
