@@ -1,6 +1,7 @@
 import { Hero } from "@/components/site/hero";
 import { DomainsSection } from "@/components/site/domains-section";
 import { FeaturedProjects, ImpactSection, JourneySection, LatestArticles } from "@/components/site/home-sections";
+import { SpotlightSection } from "@/components/site/spotlight-section";
 import { ContactSection } from "@/components/site/contact-section";
 import { countPublished, getCategories, getFeaturedProjects, getLatestPosts, getSettings, getTimeline } from "@/lib/queries/public";
 import { siteUrl } from "@/lib/env";
@@ -41,6 +42,9 @@ export default async function HomePage() {
       {h.showImpact && <ImpactSection items={settings.impact} />}
       {h.showTimeline && <JourneySection events={timeline.slice(0, 12)} />}
       {h.showArticles && <LatestArticles posts={posts} />}
+      {h.showSpotlight && settings.spotlight?.images?.length ? (
+        <SpotlightSection title={settings.spotlight.title} lede={settings.spotlight.lede} images={settings.spotlight.images} />
+      ) : null}
       {h.showContact && <ContactSection settings={settings} />}
     </>
   );

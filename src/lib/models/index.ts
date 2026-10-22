@@ -214,6 +214,12 @@ const SiteSettingsSchema = new Schema(
       ],
       default: [],
     },
+    /** Homepage image gallery — LinkedIn screenshots, photos, announcements, etc. */
+    spotlight: {
+      title: { type: String, default: "Snapshots" },
+      lede: { type: String, default: "LinkedIn moments, screenshots, and bits of the journey worth keeping visible." },
+      images: { type: [ImageSchema], default: [] },
+    },
     socials: {
       github: { type: String, default: "" },
       linkedin: { type: String, default: "https://www.linkedin.com/in/ebad-khan-b656153ba" },
@@ -233,6 +239,7 @@ const SiteSettingsSchema = new Schema(
       showImpact: { type: Boolean, default: true },
       showTimeline: { type: Boolean, default: true },
       showArticles: { type: Boolean, default: true },
+      showSpotlight: { type: Boolean, default: true },
       showContact: { type: Boolean, default: true },
       featuredLimit: { type: Number, default: 4 },
       articlesLimit: { type: Number, default: 3 },

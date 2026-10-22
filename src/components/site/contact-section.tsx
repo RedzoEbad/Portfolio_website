@@ -12,7 +12,7 @@ export function ContactSection({ settings, headingLevel = 2 }: { settings: Setti
       <Container wide>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8 xl:gap-16">
           <Reveal variant="rise" className="lg:col-span-5">
-            <p className="mb-3 font-mono text-[11px] tracking-[0.22em] text-signal uppercase">06 — Contact</p>
+            <p className="mb-3 font-mono text-[11px] tracking-[0.22em] text-signal uppercase">07 — Contact</p>
             <H id="contact-title" className="text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.02] tracking-tight" style={{ fontVariationSettings: '"opsz" 72' }}>
               Let&apos;s talk systems
             </H>
@@ -21,7 +21,7 @@ export function ContactSection({ settings, headingLevel = 2 }: { settings: Setti
             </p>
             {hasLinks && (
               <div className="mt-10">
-                <p className="mb-3 font-mono text-[11px] tracking-wider text-fog uppercase">Elsewhere</p>
+                <p className="mb-4 font-mono text-[11px] tracking-wider text-fog uppercase">Reach me</p>
                 <SocialLinks settings={settings} withLabels />
               </div>
             )}

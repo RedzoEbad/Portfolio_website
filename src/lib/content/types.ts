@@ -87,6 +87,7 @@ export type SettingsDTO = {
   hero: { headline: string; subheadline: string; statusText: string; statusTone: "available" | "busy" | "learning" | "hidden" };
   about: { intro: string; body: string };
   impact: { title: string; description: string; icon: string; metricValue: string; metricLabel: string }[];
+  spotlight: { title: string; lede: string; images: Img[] };
   socials: { github: string; linkedin: string; x: string; website: string };
   contact: { email: string; showEmail: boolean; formEnabled: boolean; note: string };
   nav: { label: string; href: string; enabled: boolean }[];
@@ -96,6 +97,7 @@ export type SettingsDTO = {
     showImpact: boolean;
     showTimeline: boolean;
     showArticles: boolean;
+    showSpotlight: boolean;
     showContact: boolean;
     featuredLimit: number;
     articlesLimit: number;

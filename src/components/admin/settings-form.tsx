@@ -15,6 +15,7 @@ import { Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { ImageField } from "./image-field";
 import { MarkdownEditor } from "./markdown-editor";
+import { ProjectImageList } from "./project-images";
 import { SortableList } from "./sortable-list";
 import { TagInput } from "./tag-input";
 import { Tabs, TabPanel, useUnsavedWarning } from "./editor-kit";
@@ -23,7 +24,7 @@ import { Panel } from "./ui";
 type In = z.input<typeof settingsSchema>;
 type Out = z.output<typeof settingsSchema>;
 type TabId = "profile" | "home" | "about" | "contact" | "nav" | "seo";
-const TAB_OF: Record<string, TabId> = { siteName: "profile", ownerName: "profile", role: "profile", location: "profile", avatar: "profile", footerNote: "profile", hero: "home", impact: "home", home: "home", about: "about", socials: "contact", contact: "contact", nav: "nav", seo: "seo" };
+const TAB_OF: Record<string, TabId> = { siteName: "profile", ownerName: "profile", role: "profile", location: "profile", avatar: "profile", footerNote: "profile", hero: "home", impact: "home", spotlight: "home", home: "home", about: "about", socials: "contact", contact: "contact", nav: "nav", seo: "seo" };
 
 export function SettingsForm({ initial, uploadsEnabled }: { initial: In; uploadsEnabled: boolean }) {
   const router = useRouter();
@@ -60,6 +61,7 @@ export function SettingsForm({ initial, uploadsEnabled }: { initial: In; uploads
     ["showImpact", "Problems I work on"],
     ["showTimeline", "Engineering journey"],
     ["showArticles", "Latest writing"],
+    ["showSpotlight", "Photo gallery"],
     ["showContact", "Contact"],
   ] as const;
 
@@ -180,6 +182,32 @@ export function SettingsForm({ initial, uploadsEnabled }: { initial: In; uploads
                 <Input aria-label="Metric value" placeholder="Metric value (optional), e.g. 40%" {...register(`impact.${i}.metricValue`)} />
                 <Input aria-label="Metric label" placeholder="Metric label, e.g. faster deploys" className="md:col-span-2" {...register(`impact.${i}.metricLabel`)} />
               </div>
+            )}
+          />
+        </Panel>
+
+        <Panel title="Photo gallery" description="A homepage section for LinkedIn screenshots, announcements, and other images — no project write-up needed.">
+          <div className="mb-5 grid gap-5 md:grid-cols-2">
+            <Field label="Section title" htmlFor="spot-title" error={e.spotlight?.title?.message}>
+              <Input id="spot-title" {...register("spotlight.title")} />
+            </Field>
+            <Field label="Short intro" htmlFor="spot-lede" error={e.spotlight?.lede?.message} className="md:col-span-2">
+              <Textarea id="spot-lede" rows={2} {...register("spotlight.lede")} />
+            </Field>
+          </div>
+          <Controller
+            control={control}
+            name="spotlight.images"
+            render={({ field }) => (
+              <ProjectImageList
+                title="Gallery images"
+                description="Upload LinkedIn screenshots or any photos. Drag to reorder. Captions are optional."
+                emptyHint="Drop in screenshots from LinkedIn, certificates, talks — whatever you want visitors to see."
+                list={field.value ?? []}
+                onChange={field.onChange}
+                uploadsEnabled={uploadsEnabled}
+                error={!!e.spotlight?.images}
+              />
             )}
           />
         </Panel>

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const AUTO_MS = 4000;
 
 /** Autoplay slider (pauses on hover) + fullscreen lightbox on click. */
-export function Gallery({ images, layout = "slider", label }: { images: Img[]; layout?: "slider" | "grid" | "stack"; label: string }) {
+export function Gallery({ images, layout = "slider", label }: { images: Img[]; layout?: "slider" | "grid" | "stack" | "mosaic"; label: string }) {
   const [slide, setSlide] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
@@ -61,23 +61,46 @@ export function Gallery({ images, layout = "slider", label }: { images: Img[]; l
   const current = lightbox !== null ? images[lightbox] : null;
   const active = images[slide] ?? images[0];
 
-  if (layout === "grid" || layout === "stack") {
+  if (layout === "grid" || layout === "stack" || layout === "mosaic") {
+    const mosaic = layout === "mosaic";
     return (
       <>
-        <ul className={cn("grid gap-4", layout === "grid" ? "sm:grid-cols-2" : "grid-cols-1")}>
+        <ul
+          className={cn(
+            "grid gap-3 sm:gap-4",
+            layout === "stack" && "grid-cols-1",
+            layout === "grid" && "sm:grid-cols-2",
+            mosaic && "sm:grid-cols-2 lg:grid-cols-3",
+          )}
+        >
           {images.map((img, i) => (
-            <li key={img.url + i} className={cn(layout === "grid" && n % 2 === 1 && i === 0 && "sm:col-span-2")}>
-              <figure>
+            <li
+              key={img.url + i}
+              className={cn(
+                layout === "grid" && n % 2 === 1 && i === 0 && "sm:col-span-2",
+                mosaic && i === 0 && n > 2 && "sm:col-span-2 sm:row-span-2",
+              )}
+            >
+              <figure className="h-full">
                 <button
                   ref={(el) => {
                     triggers.current[i] = el;
                   }}
                   type="button"
                   onClick={() => open(i)}
-                  className="group relative block aspect-[16/10] w-full overflow-hidden rounded-xl border border-line bg-hull-2"
+                  className={cn(
+                    "group relative block w-full overflow-hidden rounded-2xl border border-line bg-hull-2 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-signal/40",
+                    mosaic && i === 0 && n > 2 ? "aspect-[4/3] sm:h-full sm:min-h-[22rem] sm:aspect-auto" : "aspect-[16/10]",
+                  )}
                   aria-label={`Open image ${i + 1} of ${n}${img.alt ? `: ${img.alt}` : ""}`}
                 >
-                  <SmartImage src={img.url} alt={img.alt || ""} fill sizes={layout === "grid" ? "(min-width: 640px) 50vw, 100vw" : "100vw"} className="object-contain p-1" />
+                  <SmartImage
+                    src={img.url}
+                    alt={img.alt || ""}
+                    fill
+                    sizes={mosaic ? "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" : layout === "grid" ? "(min-width: 640px) 50vw, 100vw" : "100vw"}
+                    className={cn(mosaic ? "object-cover transition-transform duration-500 group-hover:scale-[1.03]" : "object-contain p-1")}
+                  />
                   <span className="glass absolute right-3 bottom-3 grid h-8 w-8 place-items-center rounded-full opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true">
                     <ZoomIn className="h-4 w-4" />
                   </span>

@@ -43,6 +43,22 @@ const loadSettings = unstable_cache(
       s.contact.email = DEFAULT_CONTACT.email;
       s.contact.showEmail = true;
     }
+    if (!s.spotlight) s.spotlight = { title: "Snapshots", lede: "LinkedIn moments, screenshots, and bits of the journey worth keeping visible.", images: [] };
+    if (!s.spotlight.images) s.spotlight.images = [];
+    if (!s.home) {
+      s.home = {
+        showDomains: true,
+        showFeatured: true,
+        showImpact: true,
+        showTimeline: true,
+        showArticles: true,
+        showSpotlight: true,
+        showContact: true,
+        featuredLimit: 4,
+        articlesLimit: 3,
+      };
+    }
+    if (s.home.showSpotlight == null) s.home.showSpotlight = true;
     return s;
   },
   ["site-settings"],

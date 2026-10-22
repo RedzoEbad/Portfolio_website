@@ -210,6 +210,13 @@ export const settingsSchema = z.object({
     )
     .max(16)
     .default([]),
+  spotlight: z
+    .object({
+      title: trimmed(80).default("Snapshots"),
+      lede: trimmed(300).default(""),
+      images: z.array(imageSchema).max(48).default([]),
+    })
+    .default({ title: "Snapshots", lede: "", images: [] }),
   socials: z.object({ github: optionalUrl, linkedin: optionalUrl, x: optionalUrl, website: optionalUrl }),
   contact: z.object({
     email: z.string().trim().max(200).refine((v) => v === "" || z.email().safeParse(v).success, "Enter a valid email.").default(""),
@@ -224,6 +231,7 @@ export const settingsSchema = z.object({
     showImpact: z.boolean(),
     showTimeline: z.boolean(),
     showArticles: z.boolean(),
+    showSpotlight: z.boolean(),
     showContact: z.boolean(),
     featuredLimit: z.coerce.number().int().min(1).max(12),
     articlesLimit: z.coerce.number().int().min(1).max(12),
