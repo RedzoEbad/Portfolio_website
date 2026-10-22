@@ -4,7 +4,7 @@ import { unstable_cache } from "next/cache";
 import { Types, type PipelineStage } from "mongoose";
 import { connectDB } from "../db";
 import { BlogCategory, BlogPost, Category, Certification, Project, SiteSettings, Skill, TimelineEvent } from "../models";
-import { DEFAULT_IMPACT, DEFAULT_NAV } from "../content/defaults";
+import { DEFAULT_CONTACT, DEFAULT_IMPACT, DEFAULT_NAV, DEFAULT_SOCIALS } from "../content/defaults";
 import { escapeRegex } from "../utils";
 import { serialize } from "./serialize";
 import { CACHE_TAGS } from "../revalidate";
@@ -35,6 +35,14 @@ const loadSettings = unstable_cache(
     }
     const s = serialize<SettingsDTO>(doc);
     if (!s.nav?.length) s.nav = DEFAULT_NAV;
+    // Keep public contact details filled when older settings docs omit them.
+    if (!s.socials) s.socials = { ...DEFAULT_SOCIALS };
+    if (!s.socials.linkedin) s.socials.linkedin = DEFAULT_SOCIALS.linkedin;
+    if (!s.contact) s.contact = { ...DEFAULT_CONTACT };
+    if (!s.contact.email) {
+      s.contact.email = DEFAULT_CONTACT.email;
+      s.contact.showEmail = true;
+    }
     return s;
   },
   ["site-settings"],

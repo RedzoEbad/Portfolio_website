@@ -15,8 +15,19 @@ async function main() {
     await m.syncIndexes();
     console.log(`✔ indexes: ${m.collection.collectionName}`);
   }
-  await SiteSettings.updateOne({ key: "site" }, { $setOnInsert: { key: "site", nav: DEFAULT_NAV, impact: DEFAULT_IMPACT } }, { upsert: true });
-  console.log("✔ site settings document present");
+  await SiteSettings.updateOne(
+    { key: "site" },
+    {
+      $setOnInsert: { key: "site", nav: DEFAULT_NAV, impact: DEFAULT_IMPACT },
+      $set: {
+        "socials.linkedin": "https://www.linkedin.com/in/ebad-khan-b656153ba",
+        "contact.email": "ebadkhan6292002@gmail.com",
+        "contact.showEmail": true,
+      },
+    },
+    { upsert: true },
+  );
+  console.log("✔ site settings document present (LinkedIn + public email)");
 
   if ((await Category.countDocuments()) === 0) {
     await Category.insertMany(DEFAULT_DOMAINS);

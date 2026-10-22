@@ -28,7 +28,7 @@ type TabId = "basics" | "story" | "build" | "media" | "publish";
 
 const TAB_OF: Record<string, TabId> = {
   title: "basics", slug: "basics", summary: "basics", category: "basics", tags: "basics", technologies: "basics", githubUrl: "basics", demoUrl: "basics", relatedProjects: "basics", projectState: "basics",
-  sections: "story", implementationSteps: "build", codeSnippets: "build", coverImage: "media", gallery: "media", architectureImages: "media",
+  sections: "story", implementationSteps: "build", codeSnippets: "build", coverImage: "media", systemDesignImage: "media", gallery: "media", architectureImages: "media",
   status: "publish", featured: "publish", order: "publish", seo: "publish",
 };
 
@@ -229,10 +229,28 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
 
       {/* ---------------- Case study ---------------- */}
       <TabPanel id="story" active={tab === "story"}>
+        <Panel
+          title="System design / flow"
+          description="Shown on the project page before the case study overview. Upload your architecture or flow diagram here."
+        >
+          <Controller
+            control={control}
+            name="systemDesignImage"
+            render={({ field }) => (
+              <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="System design image" withCaption />
+            )}
+          />
+          {errors.systemDesignImage && (
+            <p className="mt-2 text-xs text-flare">
+              {(errors.systemDesignImage as { url?: { message?: string } }).url?.message ?? "Check the system design image."}
+            </p>
+          )}
+        </Panel>
+
         {(() => {
           const overviewIndex = sections.fields.findIndex((f) => f.type === "overview");
           return (
-            <Panel title="Case study" description="Paste your full case study below (Markdown). This is what visitors read on the project page.">
+            <Panel title="Case study" description="Paste your full case study below (Markdown). This is what visitors read on the project page after the system design image.">
               {overviewIndex >= 0 ? (
                 <Controller
                   control={control}
@@ -407,6 +425,23 @@ export function ProjectEditor({ id, initial, categories, projects, uploadsEnable
         <Panel title="Cover image" description="Main image on project cards and at the top of the case study. Upload a file or paste a URL.">
           <Controller control={control} name="coverImage" render={({ field }) => <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="Cover image" />} />
           {errors.coverImage && <p className="mt-2 text-xs text-flare">{(errors.coverImage as { url?: { message?: string } }).url?.message ?? "Check the cover image."}</p>}
+        </Panel>
+        <Panel
+          title="System design / flow"
+          description="Architecture or flow diagram shown before the case study overview on the project page."
+        >
+          <Controller
+            control={control}
+            name="systemDesignImage"
+            render={({ field }) => (
+              <ImageField value={field.value ?? null} onChange={field.onChange} uploadsEnabled={uploadsEnabled} label="System design image" withCaption />
+            )}
+          />
+          {errors.systemDesignImage && (
+            <p className="mt-2 text-xs text-flare">
+              {(errors.systemDesignImage as { url?: { message?: string } }).url?.message ?? "Check the system design image."}
+            </p>
+          )}
         </Panel>
         <Controller
           control={control}

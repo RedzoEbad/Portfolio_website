@@ -25,6 +25,7 @@ export default async function EditProject({ params }: { params: Promise<{ id: st
     githubUrl: p.githubUrl ?? "",
     demoUrl: p.demoUrl ?? "",
     coverImage: p.coverImage ? { url: p.coverImage.url, alt: p.coverImage.alt ?? "", caption: p.coverImage.caption ?? "" } : null,
+    systemDesignImage: p.systemDesignImage ? { url: p.systemDesignImage.url, alt: p.systemDesignImage.alt ?? "", caption: p.systemDesignImage.caption ?? "" } : null,
     gallery: p.gallery.map((g) => ({ url: g.url, alt: g.alt ?? "", caption: g.caption ?? "" })),
     architectureImages: p.architectureImages.map((g) => ({ url: g.url, alt: g.alt ?? "", caption: g.caption ?? "" })),
     sections,

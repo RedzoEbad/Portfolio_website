@@ -31,6 +31,7 @@ export type ProjectDTO = {
   githubUrl: string;
   demoUrl: string;
   coverImage: Img | null;
+  systemDesignImage: Img | null;
   gallery: Img[];
   architectureImages: Img[];
   sections: ProjectSection[];

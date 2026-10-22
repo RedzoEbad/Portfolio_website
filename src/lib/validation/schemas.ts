@@ -95,6 +95,7 @@ export const projectSchema = z.object({
   githubUrl: optionalUrl,
   demoUrl: optionalUrl,
   coverImage: imageSchema.nullable().default(null),
+  systemDesignImage: imageSchema.nullable().default(null),
   gallery: z.array(imageSchema).max(40).default([]),
   architectureImages: z.array(imageSchema).max(20).default([]),
   sections: z.array(sectionSchema).max(40).default([]),

@@ -64,6 +64,8 @@ const ProjectSchema = new Schema(
     githubUrl: { type: String, default: "" },
     demoUrl: { type: String, default: "" },
     coverImage: { type: ImageSchema, default: null },
+    /** Hero system-design / flow diagram shown before the case-study overview. */
+    systemDesignImage: { type: ImageSchema, default: null },
     gallery: { type: [ImageSchema], default: [] },
     architectureImages: { type: [ImageSchema], default: [] },
     /** Ordered, toggleable case-study sections. Markdown for narrative sections; structured sections render from the fields below. */
@@ -214,13 +216,13 @@ const SiteSettingsSchema = new Schema(
     },
     socials: {
       github: { type: String, default: "" },
-      linkedin: { type: String, default: "" },
+      linkedin: { type: String, default: "https://www.linkedin.com/in/ebad-khan-b656153ba" },
       x: { type: String, default: "" },
       website: { type: String, default: "" },
     },
     contact: {
-      email: { type: String, default: "" },
-      showEmail: { type: Boolean, default: false },
+      email: { type: String, default: "ebadkhan6292002@gmail.com" },
+      showEmail: { type: Boolean, default: true },
       formEnabled: { type: Boolean, default: true },
       note: { type: String, default: "" },
     },

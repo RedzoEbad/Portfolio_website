@@ -213,13 +213,49 @@ export function CaseStudy({ project: p, related, articles = [], preview = false 
         </Reveal>
       </Container>
 
+      {p.systemDesignImage?.url && (
+        <Container className="mt-12 md:mt-16">
+          <Reveal variant="rise">
+            <figure id="system-design" className="scroll-mt-28">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="mb-1 font-mono text-[11px] tracking-[0.2em] text-signal uppercase">System design</p>
+                  <h2 className="text-2xl tracking-tight md:text-3xl" style={{ fontVariationSettings: '"opsz" 64' }}>
+                    Architecture &amp; flow
+                  </h2>
+                </div>
+              </div>
+              <div className="relative overflow-hidden rounded-2xl border border-line bg-hull-2">
+                <div className="relative aspect-[16/10] w-full sm:aspect-[21/10]">
+                  <SmartImage
+                    src={p.systemDesignImage.url}
+                    alt={p.systemDesignImage.alt || `${p.title} system design diagram`}
+                    fill
+                    sizes="(min-width: 1280px) 1216px, 100vw"
+                    className="object-contain p-3 sm:p-5"
+                  />
+                </div>
+              </div>
+              {p.systemDesignImage.caption && (
+                <figcaption className="mt-3 text-center text-sm text-fog">{p.systemDesignImage.caption}</figcaption>
+              )}
+            </figure>
+          </Reveal>
+        </Container>
+      )}
+
       <Container className="mt-14 md:mt-20">
         {visible.length === 0 ? (
           <p className="text-fog">The full write-up for this project hasn&apos;t been published yet.</p>
         ) : (
           <div className="grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
             <aside className="min-w-0">
-              <CaseStudyNav items={navItems} />
+              <CaseStudyNav
+                items={[
+                  ...(p.systemDesignImage?.url ? [{ id: "system-design", title: "System design" }] : []),
+                  ...navItems,
+                ]}
+              />
             </aside>
             <div className="min-w-0 space-y-20">
               {visible.map((s) => (

@@ -5,7 +5,7 @@ import { CASE_STUDY_SECTIONS } from "./constants";
 /** Blank editor values, shared by server pages and client editors. */
 export function emptyProject(): z.input<typeof projectSchema> {
   return {
-    title: "", slug: "", summary: "", category: null, tags: [], technologies: [], githubUrl: "", demoUrl: "", coverImage: null, gallery: [], architectureImages: [],
+    title: "", slug: "", summary: "", category: null, tags: [], technologies: [], githubUrl: "", demoUrl: "", coverImage: null, systemDesignImage: null, gallery: [], architectureImages: [],
     sections: CASE_STUDY_SECTIONS.map((s) => ({ type: s.type, title: s.title, enabled: true, content: "" })),
     implementationSteps: [], codeSnippets: [], relatedProjects: [], projectState: "completed", status: "draft", featured: false, order: 0,
     seo: { title: "", description: "", ogImage: "" },

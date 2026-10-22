@@ -2,6 +2,20 @@
  * Defaults used when settings have never been saved. They contain no claims about
  * the site owner beyond the copy in the brief: no metrics, no employers, no dates.
  */
+export const DEFAULT_SOCIALS = {
+  github: "",
+  linkedin: "https://www.linkedin.com/in/ebad-khan-b656153ba",
+  x: "",
+  website: "",
+} as const;
+
+export const DEFAULT_CONTACT = {
+  email: "ebadkhan6292002@gmail.com",
+  showEmail: true,
+  formEnabled: true,
+  note: "",
+} as const;
+
 export const DEFAULT_NAV = [
   { label: "Projects", href: "/projects", enabled: true },
   { label: "Domains", href: "/#domains", enabled: true },

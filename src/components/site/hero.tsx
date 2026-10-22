@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowDownRight } from "lucide-react";
 import type { SettingsDTO } from "@/lib/content/types";
 import { buttonClass } from "@/components/ui/button";
-import { GithubMark } from "@/components/ui/brand-icons";
+import { Mail } from "lucide-react";
+import { GithubMark, LinkedinMark } from "@/components/ui/brand-icons";
 import { HeroDiagram } from "./hero-diagram";
 import { Container } from "./section-header";
 import { cn, isSafeHttpUrl } from "@/lib/utils";
@@ -13,6 +14,8 @@ const TONE: Record<string, string> = { available: "text-[#2dd4bf]", busy: "text-
 export function Hero({ settings }: { settings: SettingsDTO }) {
   const { hero } = settings;
   const github = isSafeHttpUrl(settings.socials.github) ? settings.socials.github : null;
+  const linkedin = isSafeHttpUrl(settings.socials.linkedin) ? settings.socials.linkedin : null;
+  const email = settings.contact.showEmail && settings.contact.email ? settings.contact.email : null;
   const firstName = settings.ownerName.split(/\s+/)[0] || settings.siteName;
   const brand = settings.ownerName || settings.siteName;
   const lines = hero.headline.match(/[^.!?]+[.!?]?/g)?.map((l) => l.trim()).filter(Boolean) ?? [hero.headline];
@@ -60,6 +63,18 @@ export function Hero({ settings }: { settings: SettingsDTO }) {
                 <a href={github} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost", "lg")}>
                   <GithubMark className="h-4 w-4" />
                   GitHub
+                </a>
+              )}
+              {linkedin && (
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost", "lg")}>
+                  <LinkedinMark className="h-4 w-4" />
+                  LinkedIn
+                </a>
+              )}
+              {email && (
+                <a href={`mailto:${email}`} className={buttonClass("ghost", "lg")}>
+                  <Mail className="h-4 w-4" />
+                  Email
                 </a>
               )}
             </div>
